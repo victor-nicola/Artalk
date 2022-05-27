@@ -5,6 +5,8 @@ const bcrypt = require( "bcrypt" );
 const jwt = require( "jsonwebtoken" );
 const multer = require( "multer" );
 var upload = multer( { dest: "assets/profilePics/" } );
+const generateUuid = require('@supercharge/strings');
+const fs = require("fs");
 // var multiparty = require('multiparty');
 // const { inspect } = require('node:util');
 // const util = require('node:util');
@@ -32,29 +34,6 @@ router.post( "/login", async( req, res ) => {
 });
 
 router.post( "/register", upload.single( "image" ), async( req, res ) => {
-    // var form = new multiparty.Form();
-    // form.parse(req, function(err, fields, files) {
-    //     console.info(err);
-    //     console.info(fields);
-    //     console.info(file);
-    //     var temp = fields;
-    //     temp.image = {};
-    //     temp.image.data = fs.readFileSync(files.image[0].path);
-    //     temp.image.contentType = 'image';
-    //  });
-    // for(var pair of req.body.entries()) {
-    //     console.log(`${pair[0]}: ${pair[1]}`);
-    // }
-
-    // util.inspect(req.body);
-
-    console.log(req.body.name);
-    console.log(req.body.surname);
-    console.log(req.body.username);
-    console.log(req.body.email);
-    console.log(req.body.password);
-    console.log(req.body.image);
-
     const usernameExists = await User.findOne( { username: req.body.username } );
     if ( usernameExists )
         return res.status( 400 ).send( "Username already exists!" );
@@ -64,10 +43,16 @@ router.post( "/register", upload.single( "image" ), async( req, res ) => {
         return res.status( 400 ).send( "Email already exists!" );
     
     const { error } = registerValidation( req.body );
-    if ( error )
+    if ( error ) {
         return res.status( 400 ).send( error.details[0].message );
+    }
 
-    if ( !req.file )
+    const array = req.body.image.split( "," );
+    const imgFormat = array[0].substring( 11, array[0].search( new RegExp(';') ) );
+    const base64Data = array[1];
+    const uuid = generateUuid.uuid(); 
+    const filePath = "./assets/profilePics/" + uuid + "." + imgFormat;
+    if ( !base64Data )
         return res.status( 400 ).send( "File does not exist!" );
     
     const salt = await bcrypt.genSalt( 10 );
@@ -79,14 +64,18 @@ router.post( "/register", upload.single( "image" ), async( req, res ) => {
         username: req.body.username,
         email: req.body.email,
         password: hashedPassword,
-        image: req.file.path,
+        image: filePath,
         noFollowers: 0,
         noFollowing: 0,
         noPosts: 0
     });
     
     try {
-        const savedUser = await user.save();
+        const savedUser = await user.save();        
+        fs.writeFile(filePath, base64Data, 'base64', function(err) {
+            console.log("ERROR: " + err);
+        });
+
         res.send( "succes" );
     }
     catch( err ) {

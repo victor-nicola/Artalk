@@ -9,6 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 const Item = ( {elem, toUser, toLikers, like, dislike, toComments, refresh} ) => {
     const { ipString } = useContext( EnvContext );
     
+    console.log( elem.post.image );
+
     return (
         <View>
             <TouchableOpacity style = {{flexDirection: "row", backgroundColor: "#3b3b3b"}} onPress = {toUser}>
@@ -145,7 +147,9 @@ export default function HomeScreen( {navigation} ) {
     return (
         <View style = {styles.View}>
             <View style = {styles.LogoBanner} >
-                <Image style = { { width: 50, height: 50, alignSelf: "center" } } source = {require("../app-logo.png")}/>
+                <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}}>
+                    <Image style = { { width: 50, height: 50, alignSelf: "center" } } source = {require("../app-logo.png")}/>
+                </TouchableOpacity>
                 <TouchableOpacity style = {styles.SearchBtn} onPress = {() => {navigation.navigate( "searchScreen" )}}>
                     <AntDesign style = {{margin: 5}} name = "search1" size = { 24 } color = "#fff" />
                 </TouchableOpacity>

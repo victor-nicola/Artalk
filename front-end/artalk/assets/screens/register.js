@@ -38,16 +38,23 @@ export default function Register( {navigation} ) {
 
     const data = new FormData();
     if ( image != null ) {
-        const newImageUri = "file:///" + image.split( "file:/" ).join( "" );
-        const typeImage = image.substring( 5, image.search( new RegExp(';') ) );
-        console.log( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + image );
+        // const newImageUri = "file:///" + image.split( "file:/" ).join( "" );
+        // scoti data:image/ceva;base64
+        // const typeImage = image.substring( 5, image.search( new RegExp(';') ) );
+        // console.log( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + image );
         // console.log("------------------------" + Mime.getType(newImageUri));
-        console.log( "-----------------------------------------------------" + typeImage ); // 5 bcs 'data:'
-        data.append( "image", {
-            uri: newImageUri,
-            type: typeImage,
-            name: newImageUri.split( "/" ).pop()
-        });
+        // console.log( "-----------------------------------------------------" + typeImage ); // 5 bcs 'data:'
+        // console.log(newImageUri);
+        // console.log(typeImage);
+        // console.log(newImageUri.split( "/" ).pop());
+        // data.append( "image", {
+        //     uri: newImageUri,
+        //     type: typeImage,
+        //     name: newImageUri.split( "/" ).pop()
+        // });
+        data.append( "image", image );
+        // console.log("data:" + data);
+        // console.log("data:" + data["image"]);
     }
     data.append( "name", name );
 
@@ -58,11 +65,11 @@ export default function Register( {navigation} ) {
     data.append( "email", email );
     data.append( "password", password );
 
-    for(var pair of data.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-        // if ( pair[0] == "image" )
-        //     console.log( pair[1].uri );
-    }
+    // for(var pair of data.entries()) {
+    //     console.log(`${pair[0]}: ${pair[1]}` );
+    //     // if ( pair[0] == "image" )
+    //     //     console.log( pair[1].uri );
+    // }
 
     // const register = async() => {
     //     const options = {
@@ -107,8 +114,8 @@ export default function Register( {navigation} ) {
                     {image && <Image source = { { uri:image } } style = { { width: 200, height: 200, alignSelf: "center" } }/>}
                 {/* </TouchableOpacity> */}
                 </View>
-                <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => {register( JSON.stringify(Object.fromEntries(data.entries())) );}}>
-                {/* <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => {register(data);}}> */}
+                {/* <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => { register( JSON.stringify(Object.fromEntries(data.entries())) );}}> */}
+                <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => {register(data);}}>
                     <Text>Register</Text>
                 </TouchableOpacity>
                 <View style = {{flexDirection: "row", margin: 5}}>

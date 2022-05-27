@@ -37,12 +37,13 @@ export default function MakePostScreen() {
 
     const data = new FormData();
     if ( image != null ) {
-        const newImageUri = "file:///" + image.split( "file:/" ).join( "" );
-        data.append( "image", { 
-            uri: newImageUri,
-            type: Mime.getType( newImageUri ),
-            name: newImageUri.split( "/" ).pop()
-        });
+        // const newImageUri = "file:///" + image.split( "file:/" ).join( "" );
+        // data.append( "image", { 
+        //     uri: newImageUri,
+        //     type: Mime.getType( newImageUri ),
+        //     name: newImageUri.split( "/" ).pop()
+        // });
+        data.append( "image", image );
         data.append( "caption", caption );
     }
 

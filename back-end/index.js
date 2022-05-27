@@ -17,6 +17,8 @@ mongoose.connect( process.env.DB_CONNECT,
 .then( () => console.log( "connected to database" ) )
 .catch( err => console.log( err ) );
 
+app.use(express.static('public')); 
+app.use('/images', express.static('images'));
 app.use( express.json() );
 app.use( express.urlencoded( { extended: true } ) );
 

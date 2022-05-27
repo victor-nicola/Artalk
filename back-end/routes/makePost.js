@@ -6,17 +6,23 @@ const Comment = require( "../models/comment" );
 const Likes = require( "../models/likes" );
 const multer = require( "multer" );
 var upload = multer( { dest: "assets/postPics/" } );
+const generateUuid = require('@supercharge/strings');
 
 router.post( "/makePost", upload.single( "image" ), async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const user = await User.findById( { _id: decodedToken._id }, { noPosts: 1 });
     
-    if ( !req.file )
+    const array = req.body.image.split( "," );
+    // const imgFormat = array[0].substring( 11, array[0].search( new RegExp(';') ) );
+    const base64Data = array[1];
+    const uuid = generateUuid.uuid(); 
+    const filePath = "./assets/postPics/" + uuid;
+    if ( !base64Data )
         return res.status( 400 ).send( "File does not exist!" );
 
     const post = new Post({
         userId: decodedToken._id,
-        image: req.file.path,
+        image: filePath,
         caption: req.body.caption,
         likes: 0,
         noComments: 0
@@ -24,6 +30,9 @@ router.post( "/makePost", upload.single( "image" ), async( req, res ) => {
     try {
         await post.save();
         await User.updateOne( { _id: decodedToken._id }, { noPosts: user.noPosts + 1 } );
+        require("fs").writeFile(filePath, base64Data, 'base64', function(err) {
+            console.log("ERROR: " + err);
+        });
         res.send( "Posted" );
     } catch (error) {
         console.log(error);

@@ -4,6 +4,7 @@ const Followers = require( "../models/followers" );
 const Post = require( "../models/post" );
 const Likes = require( "../models/likes" );
 const jwt = require( "jsonwebtoken" );
+const fs = require("fs");
 
 router.post( "/getSearchedUsers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
@@ -31,6 +32,22 @@ router.post( "/getFeed", async( req, res ) => {
     });
     for ( var i = 0; i < user.noFollowing; i ++ ) {
         feed[i] = await Post.find( { userId: followedUsers[i]._id } );
+        // for ( var j = 0; j < feed[i].length; j ++ ) {
+        //     var image;
+        //     fs.readFile(feed[i][j].image, function(err, content) {
+        //         image = content;
+        //     });
+        //     var aux = {
+        //         _id: feed[i][j]._id,
+        //         userId: feed[i][i].userId,
+        //         caption: feed[i][j].caption,
+        //         image: image,
+        //         likes: feed[i][j].likes,
+        //         noComments: feed[i][j].noComments,
+        //         date: feed[i][j].date
+        //     };
+        // }
+        
         feed[i].sort( ( a, b ) => { 
             if ( a.likes > b.likes )
                 return -1;
@@ -41,7 +58,7 @@ router.post( "/getFeed", async( req, res ) => {
     }
 
     var ans = [], cnt = 0;
-    for ( var i = 0; i < user.noFollowing; i ++ )
+    for ( var i = 0; i < user.noFollowing; i ++ ) {
         for ( var j = 0; j < feed[i].length; j ++ ) {
             const isLiked = await Likes.findOne( {userId: decodedToken._id, postId: feed[i][j]._id} );
             var aux = false;
@@ -50,6 +67,7 @@ router.post( "/getFeed", async( req, res ) => {
             ans[cnt] = { post: feed[i][j], user: await User.findById( { _id: feed[i][j].userId }, projection ), isLiked: aux };
             cnt ++;
         }
+    }
 
     res.send( ans );
 });

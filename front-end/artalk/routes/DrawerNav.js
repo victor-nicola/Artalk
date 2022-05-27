@@ -7,7 +7,12 @@ import { UserContext } from "../containers/userContext";
 import { EnvContext } from "../containers/envContext";
 import { DrawerContent } from "./DrawerContent";
 import UserProfile from "../assets/screens/userProfile";
-import NavigationStack from "./StackNavigator";
+import SearchScreen from "../assets/screens/searchScreen";
+import MakePostScreen from "../assets/screens/makePostScreen";
+import FollowerScreen from "../assets/screens/followerScreen";
+import FollowingScreen from "../assets/screens/followingScreen";
+import LikersScreen from "../assets/screens/likersScreen";
+import CommentsScreen from "../assets/screens/commentsScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -39,8 +44,17 @@ export default function DrawerNavigator() {
 
     return (
         <UserContext.Provider value = {{user}}>
-            <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions = {{headerShown: false}}>
-                <Drawer.Screen name = "navigationStack" component = {NavigationStack} />
+            {/* <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions = {{headerStyle:{flex:1,backgroundColor: "#3b3b3b"},headerTitleStyle:{color:"#fff"}, headerTransparent:true}} > */}
+            <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions={{headerShown:false}}>
+                <Drawer.Screen name="homeScreen" component={HomeScreen} />
+                <Drawer.Screen name = "userProfile" component = {UserProfile} />
+                <Drawer.Screen name = "searchScreen" component = {SearchScreen}/>
+                <Drawer.Screen name = "makePostScreen" component = {MakePostScreen}/>
+                <Drawer.Screen name = "followerScreen" component = {FollowerScreen}/>
+                <Drawer.Screen name = "followingScreen" component = {FollowingScreen}/>
+                <Drawer.Screen name = "likersScreen" component = {LikersScreen}/>
+                <Drawer.Screen name = "commentsScreen" component = {CommentsScreen}/>
+                {/* <Drawer.Screen name = "navigationStack" component = {NavigationStack}/> */}
             </Drawer.Navigator>
         </UserContext.Provider>
     );

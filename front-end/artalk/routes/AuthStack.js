@@ -92,18 +92,33 @@ export default function authStack() {
             const options = {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    // 'Accept': 'application/json',
+                    // "Content-Type": "application/json",
+                    // "Content-Type": "multipart/form-data"
                     // "Content-Type": "multipart/form-data; boundary=${form._boundary}",
                 },
                 body: data
             };
             
+            console.log("options: " + options );
+            console.log("data: " + data );
+            console.log("stringify data: " + JSON.stringify(Object.fromEntries(data.entries())) );
+
             // console.log("-----------------------------------------------------------------------------------------------------------------");
             // for(var pair of data.entries()) {
             //     console.log(`${pair[0]}: ${pair[1]}`);
             // }
 
-            await fetch( ipString + "api/user/register", options )
+            await fetch( ipString + "api/user/register", {
+                method: "POST",
+                headers: {
+                    // 'Accept': 'application/json',
+                    // "Content-Type": "application/json",
+                    // "Content-Type": "multipart/form-data"
+                    // "Content-Type": "multipart/form-data; boundary=${form._boundary}",
+                },
+                body: data
+            } )
             .then((res) => res.text())
             .then((res) => alert(res));
         },

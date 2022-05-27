@@ -12,11 +12,11 @@ import { UserContext } from "../containers/userContext";
 
 const Stack = createStackNavigator();
 
-export default function AppStack() {
+export default function AppStack({navigation}) {
     const {user} = useContext( UserContext );
     return (
         <Stack.Navigator screenOptions = {{headerShown: false}}>
-            <Stack.Screen name = "homeScreen" component = {HomeScreen} />
+            <Stack.Screen name = "homeScreen" component={HomeScreen}/>
             <Stack.Screen name = "userProfile" component = {UserProfile} />
             <Stack.Screen name = "searchScreen" component = {SearchScreen}/>
             <Stack.Screen name = "makePostScreen" component = {MakePostScreen}/>
