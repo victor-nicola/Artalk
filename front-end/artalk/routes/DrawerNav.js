@@ -13,6 +13,8 @@ import FollowerScreen from "../assets/screens/followerScreen";
 import FollowingScreen from "../assets/screens/followingScreen";
 import LikersScreen from "../assets/screens/likersScreen";
 import CommentsScreen from "../assets/screens/commentsScreen";
+import InboxScreen from "../assets/screens/inbox";
+import ChatScreen from "../assets/screens/chatScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -54,6 +56,8 @@ export default function DrawerNavigator() {
                 <Drawer.Screen name = "followingScreen" component = {FollowingScreen}/>
                 <Drawer.Screen name = "likersScreen" component = {LikersScreen}/>
                 <Drawer.Screen name = "commentsScreen" component = {CommentsScreen}/>
+                <Drawer.Screen name = "Inbox" component = {InboxScreen}/>
+                <Drawer.Screen name = "Chat" component = {ChatScreen}/>
                 {/* <Drawer.Screen name = "navigationStack" component = {NavigationStack}/> */}
             </Drawer.Navigator>
         </UserContext.Provider>

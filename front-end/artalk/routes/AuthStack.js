@@ -100,9 +100,9 @@ export default function authStack() {
                 body: data
             };
             
-            console.log("options: " + options );
-            console.log("data: " + data );
-            console.log("stringify data: " + JSON.stringify(Object.fromEntries(data.entries())) );
+            // console.log("options: " + options );
+            // console.log("data: " + data );
+            // console.log("stringify data: " + JSON.stringify(Object.fromEntries(data.entries())) );
 
             // console.log("-----------------------------------------------------------------------------------------------------------------");
             // for(var pair of data.entries()) {

@@ -3,6 +3,7 @@ const User = require( "../models/user" );
 const Followers = require( "../models/followers" );
 const Post = require( "../models/post" );
 const Likes = require( "../models/likes" );
+const Message = require( "../models/message" );
 const jwt = require( "jsonwebtoken" );
 const fs = require("fs");
 
@@ -12,6 +13,18 @@ router.post( "/getSearchedUsers", async( req, res ) => {
     var regex = new RegExp( "^" + req.body.searchedString, "i" );
     const userList = await User.find( {username: regex}, projection );
     res.send( userList );
+});
+
+router.post( "/getPosts", async(req, res) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
+    const posts = await Post.find( {userId: req.body.user._id} ).sort({date: -1});
+    var ans = [];
+    for ( var x = 0; x < posts.length; x ++ ) {
+        const user = await User.findById( {_id: posts[x].userId}, projection );
+        ans.push( {user: user, post: posts[x]} );
+    }
+    return res.send( ans );
 });
 
 router.post( "/getFeed", async( req, res ) => {
@@ -101,6 +114,60 @@ router.post( "/getUserData", async( req, res ) => {
     if ( !user )
         return res.status( 400 ).send( "User not found!" );
     res.send( user );
+});
+
+router.post( "/getInbox", async(req, res) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const received = await Message.find( { receiverId: decodedToken._id }, { senderId: 1, text: 1, date: 1 } );
+    const sent = await Message.find( { senderId: decodedToken._id }, { receiverId: 1, text: 1, date: 1 } );
+    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
+    var ans = [];
+    var map = new Map();
+    var messages = received.concat( sent );
+    
+    messages.sort( (a, b) => {
+        if ( a.date < b.date )
+            return 1;
+        else if ( a.date > b.date )
+            return -1;
+        return 0;
+    });
+
+    for ( var x = 0; x < messages.length; x ++ ) {
+        if ( messages[x].senderId != undefined ) {
+            if ( map.get( messages[x].senderId ) == undefined ) {
+                var user = await User.findById( { _id: messages[x].senderId }, projection );
+                map.set( messages[x].senderId, 1 );
+                ans.push( { user: user, text: messages[x].text } );
+            }
+        }
+        else if ( messages[x].receiverId != undefined ) {
+            if ( map.get( messages[x].receiverId ) == undefined ) {
+                var user = await User.findById( { _id: messages[x].receiverId }, projection );
+                map.set( messages[x].receiverId, 1 );
+                ans.push( { user: user, text: messages[x].text } );
+            }
+        }
+    }
+    // for ( var x = 0; x < userIds.length; x ++ ) {
+    //     if ( map.get( userIds[x].senderId ) == undefined ) {
+    //         var user = await User.findById( { _id: userIds[x].senderId }, projection );
+    //         var text = await Message.find( {senderId: user._id, receiverId: decodedToken._id}, {text: 1} ).sort({date: -1});
+    //         map.set( userIds[x].senderId, userIds[x].date );
+    //         ans.push( { user: user, text: text[0] } );
+    //     }
+    // }
+    // for ( var x = 0; x < userIds2.length; x ++ ) {
+    //     var w = map.get( userIds2[x].receiverId );
+    //     if ( w == undefined || (w != undefined && userIds2[x].date < w ) ) {
+    //         var user = await User.findById( { _id: userIds2[x].receiverId }, projection );
+    //         var text = await Message.find( {receiverId: user._id, senderId: decodedToken._id}, {text: 1} ).sort({date: -1});
+    //         map.set( userIds2[x].receiverId, userIds2[x].date );
+    //         ans.push( { user: user, text: text[0] } );
+    //     }
+    // }
+
+    return res.send( ans );
 });
 
 module.exports = router;

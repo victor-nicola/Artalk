@@ -7,6 +7,7 @@ const dotenv = require( "dotenv" );
 const userData = require( "./routes/userData" );
 const follow = require( "./routes/follow" );
 const makePost = require( "./routes/makePost" );
+const messages = require( "./routes/messages" );
 const cors = require("cors"); // for web requests
 
 dotenv.config();
@@ -44,5 +45,6 @@ app.use( "/api/user", userData );
 app.use( "/images", express.static( __dirname ) );
 app.use( "/api/user", follow );
 app.use( "/api/user", makePost );
+app.use( "/api/user", messages );
 
 app.listen( 50000, () => console.log( "server up and running" ) );

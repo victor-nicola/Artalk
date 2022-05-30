@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, TextInput, Touchable, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
@@ -63,7 +63,7 @@ export default function SearchScreen( {navigation} ) {
     //console.log( data );
 
     return (
-        <View style = {{flex: 1, backgroundColor: "#3b3b3b"}} >
+        <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b", alignItems: "center"}} >
             <View style = {styles.LogoBannerView}>
                 <TouchableOpacity style = {styles.BackBtn} onPress = { () => {navigation.goBack(null)} } >
                     <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
@@ -79,7 +79,7 @@ export default function SearchScreen( {navigation} ) {
                 extraData = {data}
                 scrollEnabled = {true}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         borderRadius: 30,
         borderWidth: 1,
-        borderColor: "#000",
+        borderColor: "#fff",
         height: 50,
         width: '85%',
         margin: 5,
@@ -99,20 +99,24 @@ const styles = StyleSheet.create({
         //flex: 1,
         padding: 10,
         //margin: 5,
-        width: "80%",
+        width: "85%",
         color: "#fff"
         //margin: 10
     },
     LogoBanner: {
         flexDirection: "row",
+        width: "100%",
         //marginTop: 60,
-        backgroundColor: "#3b3b3b"
+        backgroundColor: "#3b3b3b",
     },
     LogoBannerView: {
         paddingTop: 15,
         flexDirection: "row",
+        width: "100%",
         marginTop: 30,
-        backgroundColor: "#3b3b3b"
+        backgroundColor: "#3b3b3b",
+        justifyContent: "center",
+        marginBottom: 15
     },
     AvatarImage: {
         alignSelf: "center",
