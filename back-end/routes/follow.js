@@ -41,7 +41,7 @@ router.post( "/checkFollow", async( req, res ) => {
 router.post( "/unfollow", async( req, res ) => {
     var decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
 
-    const connectionExists = await User.findOne( { followerId: decodedToken._id, followedId: req.body.followedUserId } );
+    const connectionExists = await Followers.findOne( { followerId: decodedToken._id, followedId: req.body.followedUserId } );
     if ( !connectionExists )
         return res.send( "Not followed" );
     

@@ -6,6 +6,7 @@ const Likes = require( "../models/likes" );
 const Message = require( "../models/message" );
 const jwt = require( "jsonwebtoken" );
 const fs = require("fs");
+const Offer = require("../models/offer");
 
 router.post( "/getSearchedUsers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
@@ -21,8 +22,7 @@ router.post( "/getPosts", async(req, res) => {
     const posts = await Post.find( {userId: req.body.user._id} ).sort({date: -1});
     var ans = [];
     for ( var x = 0; x < posts.length; x ++ ) {
-        const user = await User.findById( {_id: posts[x].userId}, projection );
-        ans.push( {user: user, post: posts[x]} );
+        ans.push( {user: req.body.user, post: posts[x]} );
     }
     return res.send( ans );
 });
@@ -38,28 +38,13 @@ router.post( "/getFeed", async( req, res ) => {
     }
     followedUsers.sort( ( a, b ) => {
         if ( a.noFollowers < b.noFollowers )
-            return -1;
-        else if ( a.noFollowers > b.noFollowers )
             return 1;
+        else if ( a.noFollowers > b.noFollowers )
+            return -1;
         return 0;
     });
     for ( var i = 0; i < user.noFollowing; i ++ ) {
         feed[i] = await Post.find( { userId: followedUsers[i]._id } );
-        // for ( var j = 0; j < feed[i].length; j ++ ) {
-        //     var image;
-        //     fs.readFile(feed[i][j].image, function(err, content) {
-        //         image = content;
-        //     });
-        //     var aux = {
-        //         _id: feed[i][j]._id,
-        //         userId: feed[i][i].userId,
-        //         caption: feed[i][j].caption,
-        //         image: image,
-        //         likes: feed[i][j].likes,
-        //         noComments: feed[i][j].noComments,
-        //         date: feed[i][j].date
-        //     };
-        // }
         
         feed[i].sort( ( a, b ) => { 
             if ( a.likes > b.likes )
@@ -149,24 +134,78 @@ router.post( "/getInbox", async(req, res) => {
             }
         }
     }
-    // for ( var x = 0; x < userIds.length; x ++ ) {
-    //     if ( map.get( userIds[x].senderId ) == undefined ) {
-    //         var user = await User.findById( { _id: userIds[x].senderId }, projection );
-    //         var text = await Message.find( {senderId: user._id, receiverId: decodedToken._id}, {text: 1} ).sort({date: -1});
-    //         map.set( userIds[x].senderId, userIds[x].date );
-    //         ans.push( { user: user, text: text[0] } );
-    //     }
-    // }
-    // for ( var x = 0; x < userIds2.length; x ++ ) {
-    //     var w = map.get( userIds2[x].receiverId );
-    //     if ( w == undefined || (w != undefined && userIds2[x].date < w ) ) {
-    //         var user = await User.findById( { _id: userIds2[x].receiverId }, projection );
-    //         var text = await Message.find( {receiverId: user._id, senderId: decodedToken._id}, {text: 1} ).sort({date: -1});
-    //         map.set( userIds2[x].receiverId, userIds2[x].date );
-    //         ans.push( { user: user, text: text[0] } );
-    //     }
-    // }
 
+    return res.send( ans );
+});
+
+router.post( "/getOffersFeed", async(req, res) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
+    const user = await User.findById( { _id: decodedToken._id }, { noFollowing: 1 } );
+    var followedUsers = await Followers.find( { followerId: decodedToken._id } );
+    var feed = [];
+    for ( var i = 0; i < user.noFollowing; i ++ ) {
+        followedUsers[i] = await User.findById( { _id: followedUsers[i].followedId }, { noFollowers: 1 } );
+    }
+    followedUsers.sort( ( a, b ) => {
+        if ( a.noFollowers < b.noFollowers )
+            return 1;
+        else if ( a.noFollowers > b.noFollowers )
+            return -1;
+        return 0;
+    });
+    for ( var i = 0; i < user.noFollowing; i ++ ) {
+        if ( req.body.type != "" )
+            feed[i] = await Offer.find( { userId: followedUsers[i]._id, type: req.body.type } );
+        else
+            feed[i] = await Offer.find( { userId: followedUsers[i]._id } );
+
+        feed[i].sort( ( a, b ) => { 
+            if ( a.date > b.date )
+                return -1;
+            else if ( a.date < b.date )
+                return 1;
+            return 0;
+        });
+    }
+
+    var feedFollowing = [];
+    var map = new Map();
+    for ( var i = 0; i < user.noFollowing; i ++ ) {
+        for ( var j = 0; j < feed[i].length; j ++ ) {
+            feedFollowing.push({ offer: feed[i][j], user: await User.findById( { _id: feed[i][j].userId }, projection ) });
+            map.set( feed[i][j]._id.toString(), 1 );
+        }
+    }
+
+    // console.log(feed);
+
+    var feedAllAux;
+    if ( req.body.type != "" )
+        feedAllAux = await Offer.find({type: req.body.type}).sort({date: -1});
+    else
+        feedAllAux = await Offer.find().sort({date: -1});
+
+    var feedAll = [];
+    for ( var x = 0; x < feedAllAux.length; x ++ ) {
+        if ( map.get( feedAllAux[x]._id.toString() ) == undefined && feedAllAux[x].userId != decodedToken._id ) {
+            feedAll.push({ offer: feedAllAux[x], user: await User.findById( { _id: feedAllAux[x].userId }, projection ) });
+        }
+    }
+
+    const ans = feedFollowing.concat( feedAll );
+
+    res.send( ans );
+});
+
+router.post( "/getGigs", async(req, res) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
+    const gigs = await Offer.find( {userId: req.body.user._id} ).sort({date: -1});
+    var ans = [];
+    for ( var x = 0; x < gigs.length; x ++ ) {
+        ans.push( {user: req.body.user, offer: gigs[x]} );
+    }
     return res.send( ans );
 });
 

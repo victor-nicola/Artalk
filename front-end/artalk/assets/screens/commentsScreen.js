@@ -225,7 +225,7 @@ export default function CommentsScreen( {navigation, route: {params}} ) {
     useEffect( () => {
         setData( [] );
         getComments();
-    },[]);
+    },[post]);
 
     // useEffect( () => {
     //     if ( data.length > 0 ) {
@@ -264,7 +264,7 @@ export default function CommentsScreen( {navigation, route: {params}} ) {
                     <Text style = {{color: "#fff", fontSize: 25}}>Comments</Text>
                 </View>
                 <TouchableOpacity style = {{marginRight: 20}}>
-                    <Feather name="send" size={24} color="#fff" />
+                    {/* <Feather name="send" size={24} color="#fff" /> */}
                 </TouchableOpacity>
             </View>
             <View style = {{backgroundColor: "#fff", height: 1}}/>

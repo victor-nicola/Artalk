@@ -48,6 +48,17 @@ export function DrawerContent( props ) {
                         onPress = {() => {
                             props.navigation.navigate( "userProfile", {searchedUser: user} );
                         }}/>
+                        <DrawerItem 
+                        icon = {
+                            () => (
+                                <FontAwesome name="newspaper-o" size={24} color="#fff" />
+                            )
+                        }
+                        label = "Offers"
+                        labelStyle = {{color: "#ffffff"}}
+                        onPress = {() => {
+                            props.navigation.navigate( "Offers" );
+                        }}/>
                     </Drawer.Section>
                 </View>
             </DrawerContentScrollView>

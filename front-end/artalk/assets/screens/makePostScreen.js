@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons, Octicons } from "@expo/vector-icons";
 import React from "react";
 import { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Image, ScrollView } from "react-native";
@@ -7,7 +7,7 @@ import Mime from "mime";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 
-export default function MakePostScreen() {
+export default function MakePostScreen({navigation}) {
     const [caption, setCaption] = useState( "" );
     const [image, setImage] = useState( null );
     const { ipString } = useContext( EnvContext );
@@ -66,6 +66,23 @@ export default function MakePostScreen() {
 
     return (
         <View style = {{flex: 1, width: "100%", backgroundColor: "#3b3b3b"}}>
+            <View style = {styles.LogoBannerView}>
+                <View style = {{flexDirection: "row"}}>
+                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
+                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                        <Octicons name="three-bars" size={24} color="#fff"/>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <Text style = {{color: "#fff", fontSize: 25}}>Post</Text>
+                </View>
+                {/* <TouchableOpacity style = {{marginRight: 20}}>
+                    <Feather name="send" size={24} color="#fff" />
+                </TouchableOpacity> */}
+                <View style = {{width: 63}}></View>
+            </View>
             <ScrollView contentContainerStyle = {styles.ViewContainer}>
                 <View style = {styles.TextInputContainer}>
                     <TextInput style = {styles.TextInput} placeholder = {"Caption"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setCaption( text ) }/>
@@ -87,6 +104,13 @@ export default function MakePostScreen() {
 }
 
 const styles = StyleSheet.create({
+    LogoBannerView: {
+        paddingTop: 10,
+        flexDirection: "row",
+        marginBottom: 10,
+        justifyContent: "space-between",
+        backgroundColor: "#3b3b3b"
+    },
     SelectImage: {
         //width: "60%",
         borderRadius: 30,

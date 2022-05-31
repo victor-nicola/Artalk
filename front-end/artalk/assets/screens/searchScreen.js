@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FlatList, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, View, Text } from "react-native";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 import { Avatar, Caption, Title } from "react-native-paper";
@@ -65,9 +65,30 @@ export default function SearchScreen( {navigation} ) {
     return (
         <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b", alignItems: "center"}} >
             <View style = {styles.LogoBannerView}>
-                <TouchableOpacity style = {styles.BackBtn} onPress = { () => {navigation.goBack(null)} } >
+                <View style = {{flexDirection: "row"}}>
+                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
+                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                        <Octicons name="three-bars" size={24} color="#fff"/>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <Text style = {{color: "#fff", fontSize: 25}}>Search</Text>
+                </View>
+                {/* <TouchableOpacity style = {{marginRight: 20}}>
+                    <Feather name="send" size={24} color="#fff" />
+                </TouchableOpacity> */}
+                <View style = {{width: 63}}></View>
+            </View>
+            <View style = {{backgroundColor: "#fff", height: 1}}/>
+            <View style = {styles.SearchView}>
+                {/* <TouchableOpacity style = {styles.BackBtn} onPress = { () => {navigation.goBack(null)} } >
                     <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
                 </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                    <Octicons name="three-bars" size={24} color="#fff"/>
+                </TouchableOpacity> */}
                 <View style = {styles.TextInputContainer}>
                     <TextInput style = {styles.TextInput} placeholder = {"Who are you looking for?"} placeholderTextColor = "#fff" onChangeText = { ( text ) => getSearchedUser( text ) } />
                 </View>
@@ -109,14 +130,22 @@ const styles = StyleSheet.create({
         //marginTop: 60,
         backgroundColor: "#3b3b3b",
     },
-    LogoBannerView: {
+    SearchView: {
         paddingTop: 15,
         flexDirection: "row",
         width: "100%",
-        marginTop: 30,
+        // marginTop: 30,
         backgroundColor: "#3b3b3b",
         justifyContent: "center",
         marginBottom: 15
+    },
+    LogoBannerView: {
+        flexDirection: "row",
+        // marginTop: 60,
+        justifyContent: "space-between",
+        width: "100%",
+        paddingTop: 10,
+        paddingBottom: 10,
     },
     AvatarImage: {
         alignSelf: "center",

@@ -8,6 +8,7 @@ const userData = require( "./routes/userData" );
 const follow = require( "./routes/follow" );
 const makePost = require( "./routes/makePost" );
 const messages = require( "./routes/messages" );
+const offers = require("./routes/offers");
 const cors = require("cors"); // for web requests
 
 dotenv.config();
@@ -46,5 +47,6 @@ app.use( "/images", express.static( __dirname ) );
 app.use( "/api/user", follow );
 app.use( "/api/user", makePost );
 app.use( "/api/user", messages );
+app.use( "/api/user", offers );
 
 app.listen( 50000, () => console.log( "server up and running" ) );

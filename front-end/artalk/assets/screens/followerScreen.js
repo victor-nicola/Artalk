@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, TextInput, Touchable, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FlatList, StyleSheet, SafeAreaView, Touchable, TouchableOpacity, View } from "react-native";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 import { Avatar, Caption, Text, Title } from "react-native-paper";
@@ -15,8 +15,8 @@ const Item = ( {user, onPress} ) => {
             <View style = {{flexDirection: "row", alignContent: "center"}}>
                 <Avatar.Image style = { styles.AvatarImage } source = {{uri: ipString + "images/" + user.image}} size = {50} />
                 <View>
-                    <Title style = {{fontSize: 20, fontWeight: "bold", margin: 5}}>{user.name} {user.surname}</Title>
-                    <Caption style = {{margin: 5, fontSize: 15, bottom: 5}}>@{user.username}</Caption>
+                    <Title style = {{fontSize: 20, fontWeight: "bold", margin: 5, color: "#fff"}}>{user.name} {user.surname}</Title>
+                    <Caption style = {{margin: 5, fontSize: 15, bottom: 5, color: "#fff"}}>@{user.username}</Caption>
                 </View>
             </View>
         </TouchableOpacity>
@@ -59,8 +59,25 @@ export default function FollowerScreen( {navigation, route: {params}} ) {
     };
 
     return (
-        <View style = {{flex: 1, backgroundColor: "#3b3b3b"}} >
-            <View style = {styles.LogoBannerView}></View>
+        <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b"}} >
+            <View style = {styles.LogoBannerView}>
+                <View style = {{flexDirection: "row"}}>
+                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
+                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                        <Octicons name="three-bars" size={24} color="#fff"/>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <Text style = {{color: "#fff", fontSize: 25}}>Followers</Text>
+                </View>
+                {/* <TouchableOpacity style = {{marginRight: 20}}>
+                    <Feather name="send" size={24} color="#fff" />
+                </TouchableOpacity> */}
+                <View style = {{width: 63}}></View>
+            </View>
+            <View style = {{backgroundColor: "#fff", height: 1}}/>
             <FlatList 
                 data = {data}
                 renderItem = {renderItem}
@@ -68,7 +85,7 @@ export default function FollowerScreen( {navigation, route: {params}} ) {
                 extraData = {data}
                 scrollEnabled = {true}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -95,12 +112,15 @@ const styles = StyleSheet.create({
     LogoBanner: {
         flexDirection: "row",
         //marginTop: 60,
+        marginLeft: 20,
+        marginTop: 5,
         backgroundColor: "#3b3b3b"
     },
     LogoBannerView: {
-        paddingTop: 15,
+        paddingTop: 10,
         flexDirection: "row",
-        marginTop: 30,
+        marginBottom: 10,
+        justifyContent: "space-between",
         backgroundColor: "#3b3b3b"
     },
     AvatarImage: {

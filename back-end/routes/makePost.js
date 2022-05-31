@@ -98,6 +98,7 @@ router.post( "/getComments", async( req, res ) => {
         ans[cnt] = { comment: comments[i], user: user };
         cnt ++;
     }
+    // console.log(ans);
     res.send( ans );
 });
 
