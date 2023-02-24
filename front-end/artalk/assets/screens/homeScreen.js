@@ -79,7 +79,7 @@ export default function HomeScreen( {navigation} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: elem.post} )
+            body: JSON.stringify( {token: token, postId: elem.post._id, noLikes: elem.post.likes} )
         };
     
         await fetch( ipString + "api/user/like", options )
@@ -96,7 +96,7 @@ export default function HomeScreen( {navigation} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: elem.post} )
+            body: JSON.stringify( {token: token, postId: elem.post._id, noLikes: elem.post.likes} )
         };
     
         await fetch( ipString + "api/user/dislike", options )

@@ -42,7 +42,7 @@ export default function DrawerNavigator() {
         .then((res) => setUser(res));
     };
 
-    useEffect( () => {
+    useEffect(() => {
         getInfo();
     },[]);
 

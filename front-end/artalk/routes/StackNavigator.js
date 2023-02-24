@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../assets/screens/homeScreen";
 import UserProfile from "../assets/screens/userProfile";
@@ -8,12 +8,10 @@ import FollowerScreen from "../assets/screens/followerScreen";
 import FollowingScreen from "../assets/screens/followingScreen";
 import LikersScreen from "../assets/screens/likersScreen";
 import CommentsScreen from "../assets/screens/commentsScreen";
-import { UserContext } from "../containers/userContext";
 
 const Stack = createStackNavigator();
 
 export default function AppStack({navigation}) {
-    const {user} = useContext( UserContext );
     return (
         <Stack.Navigator screenOptions = {{headerShown: false}}>
             <Stack.Screen name = "homeScreen" component={HomeScreen}/>

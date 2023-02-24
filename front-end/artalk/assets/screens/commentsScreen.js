@@ -62,7 +62,7 @@ const Item = ( {elem, toUser, deleteComment} ) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, comment: elem.comment} )
+            body: JSON.stringify( {token: token, commentId: elem.comment._id, userId: elem.comment.userId} )
         };
 
         // console.log( elem.comment );
@@ -155,7 +155,7 @@ export default function CommentsScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: post} )
+            body: JSON.stringify( {token: token, postId: post.post._id} )
         };
     
         await fetch( ipString + "api/user/getComments", options )

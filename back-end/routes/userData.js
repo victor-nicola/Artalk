@@ -18,7 +18,6 @@ router.post( "/getSearchedUsers", async( req, res ) => {
 
 router.post( "/getPosts", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
     const posts = await Post.find( {userId: req.body.user._id} ).sort({date: -1});
     var ans = [];
     for ( var x = 0; x < posts.length; x ++ ) {
@@ -73,9 +72,9 @@ router.post( "/getFeed", async( req, res ) => {
 router.post( "/getFollowers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
-    const followersList = await Followers.find( { followedId: req.body.user._id }, { followerId: 1 } );
+    const followersList = await Followers.find( { followedId: req.body.userId }, { followerId: 1 } );
     const userList = [];
-    for ( var i = 0; i < req.body.user.noFollowers; i ++ ) {
+    for ( var i = 0; i < req.body.noFollowers; i ++ ) {
         userList[i] = await User.findById( { _id: followersList[i].followerId }, projection );
     }
     res.send( userList );
@@ -84,9 +83,9 @@ router.post( "/getFollowers", async( req, res ) => {
 router.post( "/getFollowedUsers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
-    const followingList = await Followers.find( { followerId: req.body.user._id }, { followedId: 1 } );
+    const followingList = await Followers.find( { followerId: req.body.userId }, { followedId: 1 } );
     const userList = [];
-    for ( var i = 0; i < req.body.user.noFollowing; i ++ ) {
+    for ( var i = 0; i < req.body.noFollowing; i ++ ) {
         userList[i] = await User.findById( { _id: followingList[i].followedId }, projection );
     }
     res.send( userList );
@@ -200,7 +199,6 @@ router.post( "/getOffersFeed", async(req, res) => {
 
 router.post( "/getGigs", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
     const gigs = await Offer.find( {userId: req.body.user._id} ).sort({date: -1});
     var ans = [];
     for ( var x = 0; x < gigs.length; x ++ ) {

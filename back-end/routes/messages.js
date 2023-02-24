@@ -7,7 +7,7 @@ router.post( "/sendMessage", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const message = new Message({
         senderId: decodedToken._id,
-        receiverId: req.body.user._id,
+        receiverId: req.body.userId,
         text: req.body.text,
         isRead: false
     });
@@ -22,11 +22,11 @@ router.post( "/sendMessage", async(req, res) => {
 
 router.post( "/deleteMessage", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    if ( decodedToken._id != req.body.message.senderId )
+    if ( decodedToken._id != req.body.senderId )
         return res.send("Error!");
 
     try {
-        await Message.deleteOne( { _id: req.body.message._id } );
+        await Message.deleteOne( { _id: req.body.messageId } );
         res.send("Deleted");
     } catch( error ) {
         console.log(error);

@@ -41,25 +41,32 @@ router.post( "/makePost", upload.single( "image" ), async( req, res ) => {
 
 router.post( "/deletePost", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const user = await User.findById( { _id: req.body.post.userId }, { noPosts: 1 } );
-    await User.updateOne( { _id: user._id }, { noPosts: user.noPosts - 1 } );
-    await Post.deleteOne( { _id: req.body.post._id } );
+    const user = await User.findById( { _id: req.body.userId }, { noPosts: 1 } );
+    if ( decodedToken._id != req.userId )
+        return res.send( "Error" );
+    try {
+        await User.updateOne( { _id: user._id }, { noPosts: user.noPosts - 1 } );
+        await Post.deleteOne( { _id: req.body._id } );
+        res.send( "Deleted" );
+    } catch(error) {
+        console.log(error);
+    }
     res.send( "Deleted!" );
 });
 
 router.post( "/like", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.post._id } );
+    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.postId } );
     if ( liked )
         return res.send( "Already liked" );
 
     const like = new Likes({
         userId: decodedToken._id,
-        postId: req.body.post._id
+        postId: req.body.postId
     });
     try {
         await like.save();
-        await Post.updateOne( { _id: req.body.post._id }, { likes: req.body.post.likes + 1 } );
+        await Post.updateOne( { _id: req.body.postId }, { likes: req.body.noLikes + 1 } );
         res.send( "Liked" );
     } catch (error) {
         console.log(error);
@@ -69,29 +76,29 @@ router.post( "/like", async( req, res ) => {
 router.post( "/getLikers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
-    const likersList = await Likes.find( { postId: req.body.post._id }, { userId: 1 } );
+    const likersList = await Likes.find( { postId: req.body.postId }, { userId: 1 } );
     const userList = [];
-    for ( var i = 0; i < req.body.post.likes; i ++ )
+    for ( var i = 0; i < req.body.likes; i ++ )
         userList[i] = await User.findById( { _id: likersList[i].userId }, projection );
     res.send( userList );
 });
 
 router.post( "/dislike", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.post._id } );
+    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.postId } );
     if ( !liked )
         return res.send( "Not liked" );
 
-    await Likes.deleteOne( { userId: decodedToken._id, postId: req.body.post._id } );
+    await Likes.deleteOne( { userId: decodedToken._id, postId: req.body.postId } );
     
-    await Post.updateOne( { _id: req.body.post._id }, { likes: req.body.post.likes - 1 } );
+    await Post.updateOne( { _id: req.body.postId }, { likes: req.body.nolikes - 1 } );
     res.send( "Disliked" );
 });
 
 router.post( "/getComments", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
-    var comments = await Comment.find( { postId: req.body.post.post._id, fatherCommentId: { $exists: false } } );
+    var comments = await Comment.find( { postId: req.body.postId, fatherCommentId: { $exists: false } } );
     var ans = [], cnt = 0;
     for ( var i = 0; i < comments.length; i ++ ) {
         const user = await User.findById( { _id: comments[i].userId }, projection );
@@ -120,10 +127,10 @@ async function getAllChildren( fatherCommentId ) {
 router.post( "/getReplies", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
-    const comms = await Comment.find( { fatherCommentId: req.body.comment._id } );
+    const comms = await Comment.find( { fatherCommentId: req.body.commentId } );
     for ( var i = 0; i < comms.length; i ++ ) {
         const user = await User.findById( { _id: comms[i].userId }, projection );
-        const userRepliedTo = await User.findById( { _id: req.body.comment.userId }, projection );;
+        const userRepliedTo = await User.findById( { _id: req.body.userId }, projection );;
         replies.push({ comment: comms[i], user: user, userRepliedTo: userRepliedTo });
         await getAllChildren( comms[i]._id );
     }

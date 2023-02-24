@@ -36,7 +36,7 @@ export default function FollowerScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, user: user} )
+            body: JSON.stringify( {token: token, userId: user._id, noFollowers: user.noFollowers} )
         };
     
         await fetch( ipString + "api/user/getFollowers", options )

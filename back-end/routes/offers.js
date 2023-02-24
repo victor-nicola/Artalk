@@ -23,10 +23,10 @@ router.post( "/makeOffer", async(req, res) => {
 
 router.post( "/deleteOffer", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    if ( decodedToken._id != req.body.offer.userId )
+    if ( decodedToken._id != req.body.userId )
         return res.send( "Error" );
     try {
-        await Offer.deleteOne( {_id: req.body.offer._id} );
+        await Offer.deleteOne( {_id: req.body.id} );
         res.send( "Deleted" );
     } catch(error) {
         console.log(error);

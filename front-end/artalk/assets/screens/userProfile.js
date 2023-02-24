@@ -138,7 +138,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: elem.post} )
+            body: JSON.stringify( {token: token, postId: elem.post._id, noLikes: elem.post.likes} )
         };
     
         await fetch( ipString + "api/user/like", options )
@@ -155,7 +155,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: elem.post} )
+            body: JSON.stringify( {token: token, postId: elem.post._id, noLikes: elem.post.likes} )
         };
     
         await fetch( ipString + "api/user/dislike", options )
@@ -226,7 +226,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: elem.post} )
+            body: JSON.stringify( {token: token, userId: elem.post.userId, postId: elem.post._id} )
         };
     
         await fetch( ipString + "api/user/deletePost", options )
@@ -244,7 +244,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, offer: elem.offer} )
+            body: JSON.stringify( {token: token, userId: elem.offer.userId, id: elem.offer._id} )
         };
     
         await fetch( ipString + "api/user/deleteOffer", options )

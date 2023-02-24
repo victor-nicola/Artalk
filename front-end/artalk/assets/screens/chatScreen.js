@@ -77,7 +77,7 @@ export default function ChatScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, user: user, text: message} )
+            body: JSON.stringify( {token: token, userId: user._id, text: message} )
         };
 
         await fetch( ipString + "api/user/sendMessage", options )
@@ -96,7 +96,7 @@ export default function ChatScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, message: elem.message} )
+            body: JSON.stringify( {token: token, messageId: elem.message._id, senderId: elem.message.senderId} )
         };
 
         await fetch( ipString + "api/user/deleteMessage", options )

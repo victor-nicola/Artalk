@@ -36,7 +36,7 @@ export default function LikersScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, post: post} )
+            body: JSON.stringify( {token: token, postId: post._id, likes: post.likes} )
         };
     
         await fetch( ipString + "api/user/getLikers", options )
