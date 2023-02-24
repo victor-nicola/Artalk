@@ -6,8 +6,14 @@ O retea de socializare care vine in ajutorul artistilor ce nu se mai pot promova
     React Native e un framework de javascript bazat pe React care are propriile componente de UI care sunt, mai apoi, transformate in componente native platformei pe care ruleaza aplicatia. Astfel, putem scrie codul o data si sa poata rula ca aplicatie de Android, IOS sau ca pagina web.
 - ### [Expo](https://expo.dev/)
     Expo este un middleware care ajuta cu buildul unei aplicatii de React/React Native, actualizarea ei in timp de productie si rularea acesteia pe diferite dispozitive in timpul developmentului.
+- ### [JWT](https://jwt.io/)
+    JWT sau Javascript Web Token este un criptat si sigur de a transmite date private intre server si client. De exemplu, la autentificare sau inregistrarea unui cont, parola, emailul si datele de contact sunt criptate prin jwt si trimise catre server unde sunt decriptate si utilizate.
+- ### [React Native Async Storage](https://reactnative.dev/docs/asyncstorage)
+    Aceasta este o librarie din React Native care permite stocarea de date local. In acest proiect este folosit pentru a stoca id-ul utilizatorului logat sub forma unui token pentru a salva sesiunea.
 ## Back end
 - ### [NodeJs](https://nodejs.org/en/)
     NodeJs este un runtime asincron de javascript bazat pe eventuri. Acesta este folosit pentru a realiza partea de server a aplicatiei si pentru a raspunde la requesturile date de client.
 - ### [MongoDB](https://www.mongodb.com/)
     MongoDB este un serviciu de host de baze de date non-relationale. Aici sunt stocate toate datele aplicatiei: utilizatori, postari, giguri, relatiile de follow intre useri etc. 
+- ### [Bcrypt](https://www.npmjs.com/package/bcrypt)
+    Bcrypt este o librarie de NodeJs care cripteaza parole folosind hash-uri. Odata ce parola este introdusa la inregistrare sau autentificare, aceasta este trimisa catre server unde este criptata si introdusa in baza de date.
