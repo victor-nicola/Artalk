@@ -1,10 +1,10 @@
 import { NavigationContainer, LinkingOptions } from '@react-navigation/native';
 import React from 'react';
-import * as Linking from "expo-linking";
+import * as Linking from 'expo-linking';
 import AuthStack from './routes/AuthStack';
 
 export default function App() {
-  const prefix = Linking.makeUrl("/");
+  const prefix = Linking.createURL('/');
   const linking = {
     prefixes: [prefix],
     config: {
