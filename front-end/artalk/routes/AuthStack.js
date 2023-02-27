@@ -10,9 +10,10 @@ import { AuthContext } from "../containers/authContext";
 import { Drawer } from "react-native-paper";
 import  DrawerNav  from "./DrawerNav";
 import { EnvContext } from "../containers/envContext";
-
+import bcrypt from "bcryptjs";
 
 const Stack = createStackNavigator();
+const salt = '$2a$10$TTrGvnChh/FAch.67cwLCe';
 
 export default function authStack() {
     //const ipString = "http://172.20.10.3:3000/"; // hotspot iphone vodafone
@@ -65,12 +66,14 @@ export default function authStack() {
 
     const authContext = React.useMemo( () => ({
         logIn: async( userString, password ) => { 
+            const hashedPassword = bcrypt.hashSync(password, salt);
+           
             const options = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify( {userString: userString, password: password} )
+                body: JSON.stringify( {userString: userString, password: hashedPassword} )
             };
 
             var data, userToken;
@@ -82,7 +85,7 @@ export default function authStack() {
                     userToken = data;
                     await AsyncStorage.setItem( "userToken", userToken );
                 }
-                else
+                else if (data != '{}')
                     alert( data );
             } catch (error) {
                 console.log(error);
@@ -110,6 +113,8 @@ export default function authStack() {
             //     console.log(`${pair[0]}: ${pair[1]}`);
             // }
 
+            // console.log(data);
+
             await fetch( ipString + "api/user/register", {
                 method: "POST",
                 headers: {
@@ -121,7 +126,7 @@ export default function authStack() {
                 body: data
             } )
             .then((res) => res.text())
-            .then((res) => alert(res));
+            .then((res) => {if (res) alert(res);});
         },
         logOut: async() => {
             try {
@@ -138,7 +143,7 @@ export default function authStack() {
             var userToken = null;
             try {
                 userToken = await AsyncStorage.getItem( "userToken" );
-                console.log( userToken );
+                //console.log( userToken );                 -------------------------------------------------------------------------------------------------
             } catch (error) {
                 console.log( error );
             }
@@ -157,19 +162,19 @@ export default function authStack() {
     return (
         <EnvContext.Provider value = {{ipString}}>
         <AuthContext.Provider value = {authContext}>
-                <NavigationContainer>
+                {/* <NavigationContainer> */}
                     { logInState.userToken != null ? ( 
                     <DrawerNav/>
                     // <HomeScreen />
                     ) : (
                         <Stack.Navigator screenOptions = {{headerShown: false}}>
-                            <Stack.Screen name = "Log in" component = {LogIn} />
-                            <Stack.Screen name = "Sign up" component = {Register} />
-                            {/* <Stack.Screen name = "HomeScreen" component = {homeScreen} options = {{animationEnabled: false}}/> */}
+                            <Stack.Screen name = "LogIn" component = {LogIn} />
+                            <Stack.Screen name = "SignUp" component = {Register} />
+                            {/* <Stack.Screen name = "Home" component = {homeScreen} options = {{animationEnabled: false}}/> */}
                         </Stack.Navigator>
                         )
                     }
-                </NavigationContainer>
+                {/* </NavigationContainer> */}
         </AuthContext.Provider>
         </EnvContext.Provider>
     );

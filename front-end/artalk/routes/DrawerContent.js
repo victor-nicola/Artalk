@@ -4,16 +4,19 @@ import { StyleSheet, View } from "react-native";
 import { AuthContext } from "../containers/authContext";
 import { Avatar, Caption, Drawer, Title } from "react-native-paper";
 import { UserContext } from "../containers/userContext";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, Octicons } from "@expo/vector-icons";
 import { EnvContext } from "../containers/envContext";
+import { useLinkTo } from "@react-navigation/native";
 
 export function DrawerContent( props ) {
     const { logOut } = React.useContext( AuthContext );
     const { user } = React.useContext( UserContext );
     const { ipString } = React.useContext( EnvContext );
 
+    const linkTo = useLinkTo();
+
     return (
-        <View style = {{flex: 1, backgroundColor: "#3b3b3b"}}>
+        <View style = {{flex: 1, backgroundColor: "#111"}}>
             <DrawerContentScrollView {...props}>
                 <View style = {{flex: 1}}>
                     <View style = {{flexDirection: "row", alignContent: "center"}}>
@@ -34,7 +37,7 @@ export function DrawerContent( props ) {
                         
                         labelStyle = {{color: "#ffffff"}}
                         onPress = {() => {
-                            props.navigation.navigate( "homeScreen" );
+                            linkTo("/");
                         }}
                         />
                         <DrawerItem 
@@ -46,7 +49,29 @@ export function DrawerContent( props ) {
                         label = "User"
                         labelStyle = {{color: "#ffffff"}}
                         onPress = {() => {
-                            props.navigation.navigate( "userProfile", {searchedUser: user} );
+                            linkTo("/profile/" + user._id);
+                        }}/>
+                        <DrawerItem 
+                        icon = {
+                            () => (
+                                <Octicons name="inbox" size={24} color="#fff"/>
+                            )
+                        }
+                        label = "Inbox"
+                        labelStyle = {{color: "#ffffff"}}
+                        onPress = {() => {
+                            linkTo("/inbox");
+                        }}/>
+                        <DrawerItem 
+                        icon = {
+                            () => (
+                                <AntDesign name = "search1" size = { 24 } color = "#fff" />
+                            )
+                        }
+                        label = "Search"
+                        labelStyle = {{color: "#ffffff"}}
+                        onPress = {() => {
+                            linkTo("/search");
                         }}/>
                         <DrawerItem 
                         icon = {
@@ -54,10 +79,10 @@ export function DrawerContent( props ) {
                                 <FontAwesome name="newspaper-o" size={24} color="#fff" />
                             )
                         }
-                        label = "Offers"
+                        label = "Gigs"
                         labelStyle = {{color: "#ffffff"}}
                         onPress = {() => {
-                            props.navigation.navigate( "Offers" );
+                            linkTo("/gigs");
                         }}/>
                     </Drawer.Section>
                 </View>

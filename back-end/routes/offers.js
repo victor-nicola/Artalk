@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 
 router.post( "/makeOffer", async(req, res) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    if ( isNaN(req.body.price) || req.body.title.length > 80 || req.body.text.length > 1200 || req.body.type == "" )
+        return res.send("Invalid gig");
     const offer = new Offer({
         userId: decodedToken._id,
         title: req.body.title,

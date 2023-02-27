@@ -1,32 +1,68 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, SafeAreaView, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, SafeAreaView, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { Ionicons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 import { Avatar, Caption, Text, Title } from "react-native-paper";
+import { useLinkTo } from "@react-navigation/native";
 
 const Item = ( {user, onPress} ) => {
     const { ipString } = useContext( EnvContext );
+    const {height, width} = useWindowDimensions();
+    const [textSize, setTextSize] = useState(20);
+    
+    window.addEventListener("resize", ()=>{
+        if ( window.innerWidth < 800 )
+            setTextSize(24);
+        else
+            setTextSize(30);
+    });
+
+    useEffect(()=>{
+        if ( width < 800 )
+            setTextSize(24);
+        else
+            setTextSize(30);
+    });
     
     //console.log( user );
 
     return (
-        <TouchableOpacity style = {styles.LogoBanner} onPress = {onPress}>
-            <View style = {{flexDirection: "row", alignContent: "center"}}>
-                <Avatar.Image style = { styles.AvatarImage } source = {{uri: ipString + "images/" + user.image}} size = {50} />
-                <View>
-                    <Title style = {{fontSize: 20, fontWeight: "bold", margin: 5, color: "#fff"}}>{user.name} {user.surname}</Title>
-                    <Caption style = {{margin: 5, fontSize: 15, bottom: 5, color: "#fff"}}>@{user.username}</Caption>
+        <View style={{width:'100%', alignItems: 'center', marginTop: 15}}>
+            <TouchableOpacity style = {{}} onPress = {onPress}>
+                <View style = {{flexDirection: "row", alignContent: "center"}}>
+                    <Avatar.Image style = { styles.AvatarImage } source = {{uri: ipString + "images/" + user.image}} size = {50} />
+                    <View style={{paddingLeft: 5}}>
+                        <Title style = {{fontSize: textSize/3*2, fontWeight: "bold", color: "#fff"}}>{user.name} {user.surname}</Title>
+                        <Caption style = {{fontSize: textSize/2 + 2, color: "#fff"}}>@{user.username}</Caption>
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
+        </View>
     );
 };
 
 export default function FollowingScreen( {navigation, route: {params}} ) {
+    if (params) {
     const { ipString } = useContext( EnvContext );
     const [data, setData] = useState([]);
-    const {user} = params;
+    const {id} = params;
+    const {height, width} = useWindowDimensions();
+    const [textSize, setTextSize] = useState(30);
+    
+    window.addEventListener("resize", ()=>{
+        if ( window.innerWidth < 800 )
+            setTextSize(24);
+        else
+            setTextSize(30);
+    });
+
+    useEffect(()=>{
+        if ( width < 800 )
+            setTextSize(24);
+        else
+            setTextSize(30);
+    });
     
     const getFollowing = async() => {
         var token = await AsyncStorage.getItem( "userToken" );
@@ -36,7 +72,7 @@ export default function FollowingScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, userId: user._id, noFollowing: user.noFollowing} )
+            body: JSON.stringify( {token: token, userId: id} )
         };
     
         await fetch( ipString + "api/user/getFollowedUsers", options )
@@ -49,9 +85,11 @@ export default function FollowingScreen( {navigation, route: {params}} ) {
         getFollowing();
     },[]);
 
+    const linkTo = useLinkTo();
+
     const renderItem = ( {item} ) => {
         const onPress = () => {
-            navigation.navigate( "userProfile", {searchedUser: item} );
+            linkTo( "/profile/" + item._id );
         };
         return (
             <Item onPress = {() => onPress()} user = {item} />
@@ -59,25 +97,17 @@ export default function FollowingScreen( {navigation, route: {params}} ) {
     };
 
     return (
-        <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b"}} >
-            <View style = {styles.LogoBannerView}>
-                <View style = {{flexDirection: "row"}}>
-                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
-                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+        <SafeAreaView style = {{flex: 1, backgroundColor: "#111"}} >
+            <View style = {styles.LogoBanner} >
+                <View style = {{flex: 1, alignItems: "center", flexDirection: "row"}}>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 10}}>
                         <Octicons name="three-bars" size={24} color="#fff"/>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Text style = {{color: "#fff", fontSize: 25}}>Following</Text>
+                <View style={{flex: 1}}>
+                    <Text style = {{marginLeft: -75 + (30-textSize) * 3, fontSize:textSize, color: "#fff"}}>Following</Text>
                 </View>
-                {/* <TouchableOpacity style = {{marginRight: 20}}>
-                    <Feather name="send" size={24} color="#fff" />
-                </TouchableOpacity> */}
-                <View style = {{width: 63}}></View>
             </View>
-            <View style = {{backgroundColor: "#fff", height: 1}}/>
             <FlatList 
                 data = {data}
                 renderItem = {renderItem}
@@ -87,6 +117,7 @@ export default function FollowingScreen( {navigation, route: {params}} ) {
             />
         </SafeAreaView>
     );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -111,17 +142,20 @@ const styles = StyleSheet.create({
     },
     LogoBanner: {
         flexDirection: "row",
+        paddingTop: 5,
         //marginTop: 60,
-        marginLeft: 20,
+        paddingLeft: 20,
         marginTop: 5,
-        backgroundColor: "#3b3b3b"
+        borderBottomWidth: 1,
+        borderBottomColor: 'white',
+        paddingBottom: 10,
     },
     LogoBannerView: {
         paddingTop: 10,
         flexDirection: "row",
         marginBottom: 10,
         justifyContent: "space-between",
-        backgroundColor: "#3b3b3b"
+        backgroundColor: "#111"
     },
     AvatarImage: {
         alignSelf: "center",

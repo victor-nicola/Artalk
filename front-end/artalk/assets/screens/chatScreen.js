@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, SafeAreaView } from "react-native";
-import { Ionicons, Feather, Octicons, Entypo } from "@expo/vector-icons";
+import { Ionicons, Feather, Octicons, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 import { UserContext } from "../../containers/userContext";
 import { Avatar, Caption, Text, Title } from "react-native-paper";
+import {useLinkTo} from "@react-navigation/native";
 
 const Item = ( {elem, toUser, deleteMessage} ) => {
     const { ipString } = useContext( EnvContext );
@@ -47,10 +48,12 @@ const Item = ( {elem, toUser, deleteMessage} ) => {
 };
 
 export default function ChatScreen( {navigation, route: {params}} ) {
+    if ( params ) {
     const { ipString } = useContext( EnvContext );
     const [data, setData] = useState([]);
     const [message, setMessage] = useState("");
-    const {user} = params;
+    const [user, setUser] = useState();
+    const {id} = params;
     // console.log( user );
 
     const getMessages = async() => {
@@ -61,12 +64,28 @@ export default function ChatScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, user: user} )
+            body: JSON.stringify( {token: token, senderId: id} )
         };
     
         await fetch( ipString + "api/user/getMessages", options )
         .then((res) => res.json())
         .then((res) => setData(res));
+    };
+
+    const getUser = async() => {
+        var token = await AsyncStorage.getItem( "userToken" );
+    
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify( {token: token, userId: id} )
+        };
+    
+        await fetch( ipString + "api/user/getUser", options )
+        .then((res) => res.json())
+        .then((res) => setUser(res));
     };
 
     const postMessage = async() => {
@@ -77,7 +96,7 @@ export default function ChatScreen( {navigation, route: {params}} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, userId: user._id, text: message} )
+            body: JSON.stringify( {token: token, userId: id, text: message} )
         };
 
         await fetch( ipString + "api/user/sendMessage", options )
@@ -108,12 +127,15 @@ export default function ChatScreen( {navigation, route: {params}} ) {
 
     useEffect( () => {
         setData( [] );
+        getUser();
         getMessages();
-    },[user]);
+    },[id]);
+
+    const linkTo = useLinkTo();
 
     const renderItem = ( {item} ) => {
         const toUser = () => {
-            navigation.navigate( "userProfile", {searchedUser: item.user} );
+            linkTo( "/profile/" + item.user._id );
         };
         return (
             <Item 
@@ -126,23 +148,16 @@ export default function ChatScreen( {navigation, route: {params}} ) {
 
     // console.log(data);
     return (
-        <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b"}} >
-            <View style = {styles.LogoBannerView}>
-                <View style = {{flexDirection: "row"}}>
-                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
-                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
-                    </TouchableOpacity>
+        <SafeAreaView style = {{flex: 1, backgroundColor: "#111"}} >
+            <View style = {styles.LogoBanner} >
+                <View style = {{flex: 1, alignItems: "center", flexDirection: "row"}}>
                     <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
                         <Octicons name="three-bars" size={24} color="#fff"/>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Text style = {{color: "#fff", fontSize: 25}}>Messages</Text>
+                <View style={{flex: 1}}>
+                    {user && <Text style = {{marginLeft: -50, fontSize:25, color: "#fff"}}>@{user.username}</Text>}
                 </View>
-                {/* <TouchableOpacity style = {{marginRight: 20}}>
-                    <Feather name="send" size={24} color="#fff" />
-                </TouchableOpacity> */}
-                <View style = {{width: 63}}></View>
             </View>
             <View style = {{backgroundColor: "#fff", height: 1}}/>
             <FlatList 
@@ -164,6 +179,7 @@ export default function ChatScreen( {navigation, route: {params}} ) {
             </View>
         </SafeAreaView>
     );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -176,9 +192,9 @@ const styles = StyleSheet.create({
         // borderRadius: 30,
         // borderBottomWidth: 1,
         flexDirection: "row",
-        borderRadius: 30,
-        borderWidth: 1,
-        borderColor: "#fff",
+        borderBottomWidth: 1,
+        borderBottomColor: 'white',
+        marginBottom: 20,
         height: 50,
         width: '99%',
         // margin: 5,
@@ -201,7 +217,7 @@ const styles = StyleSheet.create({
         color: "#fff"
         //margin: 10
     },
-    LogoBannerView: {
+    LogoBanner: {
         flexDirection: "row",
         // marginTop: 60,
         justifyContent: "space-between",

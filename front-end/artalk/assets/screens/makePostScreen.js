@@ -1,11 +1,13 @@
 import { AntDesign, Ionicons, Octicons } from "@expo/vector-icons";
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Image, ScrollView, KeyboardAvoidingView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Mime from "mime";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
+import { useLinkTo } from "@react-navigation/native";
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default function MakePostScreen({navigation}) {
     const [caption, setCaption] = useState( "" );
@@ -31,7 +33,11 @@ export default function MakePostScreen({navigation}) {
             quality: 0
         });
         if ( !result.cancelled ) {
-            setImage( result.uri );
+            const comprPic = await ImageManipulator.manipulateAsync(
+                result.uri,
+                [{ resize: { width: 470 } }]
+            );
+            setImage( comprPic.uri );
         }
     };
 
@@ -64,76 +70,82 @@ export default function MakePostScreen({navigation}) {
         .then((res) => alert(res));
     };
 
+    const linkTo = useLinkTo();
+
     return (
-        <View style = {{flex: 1, width: "100%", backgroundColor: "#3b3b3b"}}>
-            <View style = {styles.LogoBannerView}>
-                <View style = {{flexDirection: "row"}}>
-                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
-                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
-                    </TouchableOpacity>
+        <View style = {{flex: 1, width: "100%", backgroundColor: "#111"}}>
+            <View style = {styles.LogoBanner} >
+                <View style = {{flex: 1, alignItems: "center", flexDirection: "row"}}>
                     <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
                         <Octicons name="three-bars" size={24} color="#fff"/>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Text style = {{color: "#fff", fontSize: 25}}>Post</Text>
-                </View>
-                {/* <TouchableOpacity style = {{marginRight: 20}}>
-                    <Feather name="send" size={24} color="#fff" />
-                </TouchableOpacity> */}
-                <View style = {{width: 63}}></View>
+                <Text style = {{marginLeft: -140, flex: 1, fontSize:30, color: "#fff"}}>Make post</Text>
             </View>
-            <ScrollView contentContainerStyle = {styles.ViewContainer}>
-                <View style = {styles.TextInputContainer}>
+            <View style = {styles.ViewContainer}>
+                <KeyboardAvoidingView style = {styles.TextInputContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <TextInput style = {styles.TextInput} placeholder = {"Caption"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setCaption( text ) }/>
-                </View>
-                <View>
-                <TouchableOpacity style = {styles.SelectImage} onPress = {() => pickImage() }>
-                    <Text style = {{margin: 5, paddingLeft: 70, paddingRight: 70}}>Select image</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity onPress = {() => displayImage()}>  */}
-                    {image && <Image source = { { uri:image } } style = { { width: 200, height: 200, alignSelf: "center" } }/>}
-                {/* </TouchableOpacity> */}
+                </KeyboardAvoidingView>
+                <View style={{alignItems:'center'}}>
+                    <TouchableOpacity style = {styles.SelectImage} onPress = {() => pickImage() }>
+                        <Text style = {styles.ButtonText}>Select image</Text>
+                    </TouchableOpacity>
+                    {/* <TouchableOpacity onPress = {() => displayImage()}>  */}
+                        {image && <Image source = { { uri:image } } style = { { width: 300, height: 300, alignSelf: "center", resizeMode: 'cover' } }/>}
+                    {/* </TouchableOpacity> */}
                 </View>
                 <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => { makePost( data ); }}>
-                    <Text>Post</Text>
+                    <Text style={styles.ButtonText}>Post</Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    LogoBannerView: {
+    LogoBanner: {
         paddingTop: 10,
         flexDirection: "row",
         marginBottom: 10,
         justifyContent: "space-between",
-        backgroundColor: "#3b3b3b"
+        backgroundColor: "#111"
     },
     SelectImage: {
         //width: "60%",
         borderRadius: 30,
-        height: 40,
+        height: 50,
+        width: 300,
         //alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#9c9c9c",
+        alignItems: "center",
+        backgroundColor: "#ab260f",
         margin: 5
     },
+    ButtonText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white"
+    },
     TouchableOpacity: {
-        width: "60%",
-        borderRadius: 30,
-        height: 40,
-        alignItems: "center",
+        height: 30,
+        //flex: 1,
+        //margin: 5,
+        width: "100%",
+        backgroundColor: "#115aba",
+        borderRadius: 5,
+        borderWidth: 1,
+        //borderColor: "#fff",
+        height: 50,
+        width: 300,
+        margin: 5,
+        alignItems: 'center',
         justifyContent: "center",
-        backgroundColor: "#9c9c9c",
-        margin: 5
     },
     ViewContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#3b3b3b",
+        backgroundColor: "#111",
         //margin: 5,
         width:'100%'
     },
@@ -142,24 +154,19 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#fff"
     },
-    TextInputContainer: {
-        //flex: 1,
-        //borderRadius: 30,
-        //borderWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: "#fff",
-        height: 50,
-        width: '90%',
-        margin: 5,
-        justifyContent: "center"
-    },
     TextInput: {
         height: 50,
         //flex: 1,
         padding: 10,
         //margin: 5,
-        width: "80%",
-        color: "#fff"
+        width: "100%",
+        color: "#fff",
+        // borderRadius: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: "#fff",
+        height: 50,
+        width: 300,
+        margin: 5,
         //margin: 10
     }
 });

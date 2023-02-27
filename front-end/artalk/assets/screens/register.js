@@ -4,6 +4,11 @@ import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpaci
 import * as ImagePicker from "expo-image-picker";
 import Mime from "mime";
 import { AuthContext } from "../../containers/authContext";
+import bcrypt from "bcryptjs";
+import { useLinkTo } from "@react-navigation/native";
+import * as ImageManipulator from 'expo-image-manipulator';
+
+const salt = '$2a$10$TTrGvnChh/FAch.67cwLCe';
 
 export default function Register( {navigation} ) {
     const [name, setName] = useState( "" );
@@ -32,7 +37,13 @@ export default function Register( {navigation} ) {
             quality: 0
         });
         if ( !result.cancelled ) {
-            setImage( result.uri );
+            const comprPic = await ImageManipulator.manipulateAsync(
+                result.uri,
+                [{ resize: { width: 470 } }]
+            );
+            // const comprPic = result;
+            // console.log(result.uri);
+            setImage( comprPic.uri );
         }
     };
 
@@ -52,6 +63,7 @@ export default function Register( {navigation} ) {
         //     type: typeImage,
         //     name: newImageUri.split( "/" ).pop()
         // });
+        // console.log(image);
         data.append( "image", image );
         // console.log("data:" + data);
         // console.log("data:" + data["image"]);
@@ -63,7 +75,9 @@ export default function Register( {navigation} ) {
     data.append( "surname", surname );
     data.append( "username", username );
     data.append( "email", email );
-    data.append( "password", password );
+
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    data.append( "password", hashedPassword );
 
     // for(var pair of data.entries()) {
     //     console.log(`${pair[0]}: ${pair[1]}` );
@@ -87,10 +101,12 @@ export default function Register( {navigation} ) {
 
     const { register } = React.useContext( AuthContext );
 
+    const linkTo = useLinkTo();
+
     return (
-        <View style = {{flex: 1, width: "100%", backgroundColor: "#3b3b3b"}}>
-            <KeyboardAvoidingView behavior = {Platform.OS === "ios" ? "padding" : "height"} style = {styles.ViewContainer}>
-                <Text style = {styles.Text}>Register</Text>
+        <View style = {styles.ViewContainer}>
+            <KeyboardAvoidingView style={styles.KeyboardAvoidingView} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <Text style = {styles.Title}>Sign up</Text>
                 <View style = {styles.TextInputContainer}>
                     <TextInput style = {styles.TextInput} placeholder = {"Name"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setName( text ) }/>
                 </View>
@@ -106,23 +122,23 @@ export default function Register( {navigation} ) {
                 <View style = {styles.TextInputContainer}>
                     <TextInput secureTextEntry = {true} style = {styles.TextInput} placeholder = {"Password"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setPassword( text ) }/>
                 </View>
-                <View>
+            </KeyboardAvoidingView>
+            <View style={{alignItems:'center'}}>
                 <TouchableOpacity style = {styles.SelectImage} onPress = {() => pickImage() }>
-                    <Text style = {{margin: 5, paddingLeft: 70, paddingRight: 70}}>Select image</Text>
+                    <Text style = {styles.ButtonText}>Select image</Text>
                 </TouchableOpacity>
                 {/* <TouchableOpacity onPress = {() => displayImage()}>  */}
-                    {image && <Image source = { { uri:image } } style = { { width: 200, height: 200, alignSelf: "center" } }/>}
+                    {image && <Image source = { { uri:image } } style = { { width: 300, height: 300, alignSelf: "center" } }/>}
                 {/* </TouchableOpacity> */}
-                </View>
-                {/* <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => { register( JSON.stringify(Object.fromEntries(data.entries())) );}}> */}
-                <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => {register(data);}}>
-                    <Text>Register</Text>
-                </TouchableOpacity>
-                <View style = {{flexDirection: "row", margin: 5}}>
-                    <Text style = {{color: "#fff"}}>Already have an account? </Text>
-                    <Text style = {{color: "#fff", fontWeight: "bold"}} onPress = {() => navigation.goBack( null )}>Log in</Text>
-                </View>
-            </KeyboardAvoidingView>
+            </View>
+            {/* <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => { register( JSON.stringify(Object.fromEntries(data.entries())) );}}> */}
+            <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => {register(data);linkTo('/login');}}>
+                <Text style={styles.ButtonText}>Sign up</Text>
+            </TouchableOpacity>
+            <View style = {{flexDirection: "row", margin: 5, width: 300, justifyContent: "center"}}>
+                <Text style = {{color: "#fff"}}>Already have an account? </Text>
+                <Text style = {{color: "#fff", fontWeight: "bold"}} onPress = {() => linkTo('/login')}>Log in</Text>
+            </View>
         </View>
     );
 };
@@ -132,53 +148,83 @@ const styles = StyleSheet.create({
     SelectImage: {
         //width: "60%",
         borderRadius: 30,
-        height: 40,
+        height: 50,
+        width: 300,
         //alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#9c9c9c",
+        alignItems: "center",
+        backgroundColor: "#ab260f",
         margin: 5
     },
-    TouchableOpacity: {
-        width: "60%",
-        borderRadius: 30,
-        height: 40,
+    LogIn: {
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#9c9c9c",
-        margin: 5
+    },
+    // backgroundImage: {
+    //     width: 1920,
+    //     height: 1080
+    //     //resizeMode: 'cover', // or 'stretch'
+    // },
+    TouchableOpacity: {
+        height: 50,
+        //flex: 1,
+        //margin: 5,
+        width: "100%",
+        backgroundColor: "#115aba",
+        borderRadius: 5,
+        borderWidth: 1,
+        //borderColor: "#fff",
+        height: 50,
+        width: 300,
+        margin: 5,
+        alignItems: 'center',
+        justifyContent: "center",
     },
     ViewContainer: {
-        paddingTop: 60,
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#3b3b3b",
+        flexDirection: "column",
+        backgroundColor: "#111",
+        paddingHorizontal: '25%',
         //margin: 5,
         width:'100%'
     },
-    Text: {
-        fontSize: 30,
+    KeyboardAvoidingView: {
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+    },
+    TitleWrapper: {
+        marginRight: '50%',
+    },
+    Title: {
+        fontSize: 40,
         fontWeight: "bold",
         color: "#fff"
     },
-    TextInputContainer: {
-        //flex: 1,
-        //borderRadius: 30,
-        //borderWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: "#fff",
-        height: 50,
-        width: '90%',
-        margin: 5,
-        justifyContent: "center"
+    Text: {
+        fontSize: 25,
+        color: "#fff"
+    },
+    ButtonText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white"
     },
     TextInput: {
         height: 50,
         //flex: 1,
         padding: 10,
         //margin: 5,
-        width: "80%",
-        color: "#fff"
+        width: "100%",
+        color: "#fff",
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: "#fff",
+        height: 50,
+        width: 300,
+        margin: 5,
         //margin: 10
     }
 });

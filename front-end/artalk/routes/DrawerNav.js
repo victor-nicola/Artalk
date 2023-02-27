@@ -48,20 +48,20 @@ export default function DrawerNavigator() {
 
     return (
         <UserContext.Provider value = {{user}}>
-            {/* <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions = {{headerStyle:{flex:1,backgroundColor: "#3b3b3b"},headerTitleStyle:{color:"#fff"}, headerTransparent:true}} > */}
+            {/* <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions = {{headerStyle:{flex:1,backgroundColor: "#111"},headerTitleStyle:{color:"#fff"}, headerTransparent:true}} > */}
             <Drawer.Navigator drawerContent = {(props) => <DrawerContent {...props}/>} screenOptions={{headerShown:false}}>
-                <Drawer.Screen name="homeScreen" component={HomeScreen} />
-                <Drawer.Screen name = "userProfile" component = {UserProfile} />
-                <Drawer.Screen name = "searchScreen" component = {SearchScreen}/>
-                <Drawer.Screen name = "makePostScreen" component = {MakePostScreen}/>
-                <Drawer.Screen name = "followerScreen" component = {FollowerScreen}/>
-                <Drawer.Screen name = "followingScreen" component = {FollowingScreen}/>
-                <Drawer.Screen name = "likersScreen" component = {LikersScreen}/>
-                <Drawer.Screen name = "commentsScreen" component = {CommentsScreen}/>
+                <Drawer.Screen name = "Home" component={HomeScreen} />
+                <Drawer.Screen name = "Profile" component = {UserProfile} />
+                <Drawer.Screen name = "Search" component = {SearchScreen}/>
+                <Drawer.Screen name = "MakeAPost" component = {MakePostScreen}/>
+                <Drawer.Screen name = "Followers" component = {FollowerScreen}/>
+                <Drawer.Screen name = "Following" component = {FollowingScreen}/>
+                <Drawer.Screen name = "Likes" component = {LikersScreen}/>
+                <Drawer.Screen name = "Comments" component = {CommentsScreen}/>
                 <Drawer.Screen name = "Inbox" component = {InboxScreen}/>
                 <Drawer.Screen name = "Chat" component = {ChatScreen}/>
-                <Drawer.Screen name = "Offers" component = {OffersScreen}/>
-                <Drawer.Screen name = "Make offer" component = {MakeOffer}/>
+                <Drawer.Screen name = "Gigs" component = {OffersScreen}/>
+                <Drawer.Screen name = "MakeGig" component = {MakeOffer}/>
                 {/* <Drawer.Screen name = "navigationStack" component = {NavigationStack}/> */}
             </Drawer.Navigator>
         </UserContext.Provider>

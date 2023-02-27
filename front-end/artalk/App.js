@@ -1,20 +1,64 @@
-import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer, LinkingOptions } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as Linking from "expo-linking";
 import AuthStack from './routes/AuthStack';
 
 export default function App() {
+  const prefix = Linking.makeUrl("/");
+  const linking = {
+    prefixes: [prefix],
+    config: {
+      screens: {
+        Home: '',
+        Profile: {
+          path: 'profile/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Search: 'search',
+        MakeAPost: 'make_post',
+        Followers: {
+          path: 'followers/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Following: {
+          path: 'following/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Likes: {
+          path: 'likes/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Comments: {
+          path: 'comments/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Inbox: 'inbox',
+        Chat: {
+          path: 'chat/:id',
+          parse: {
+            id: id => `${id}`,
+          },
+        },
+        Gigs: 'gigs',
+        MakeGig: 'make_gig',
+        LogIn: 'login',
+        SignUp: 'sign_up'
+      },
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AuthStack />
-      <StatusBar barStyle = {"light-content"} />
-    </View>
+    <NavigationContainer linking={linking}>
+      <AuthStack/>  
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});

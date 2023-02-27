@@ -4,6 +4,7 @@ import { Ionicons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
 import { Avatar, Caption, Title } from "react-native-paper";
+import { useLinkTo } from "@react-navigation/native";
 
 const Item = ( {user, onPress} ) => {
     const { ipString } = useContext( EnvContext );
@@ -51,9 +52,10 @@ export default function SearchScreen( {navigation} ) {
         setData( [] );
     },[]);
 
+    const linkTo = useLinkTo();
     const renderItem = ( {item} ) => {
         const onPress = () => {
-            navigation.navigate( "userProfile", {searchedUser: item} );
+            linkTo("/profile/" + item._id);
         };
         return (
             <Item onPress = {() => onPress()} user = {item} />
@@ -63,23 +65,16 @@ export default function SearchScreen( {navigation} ) {
     //console.log( data );
 
     return (
-        <SafeAreaView style = {{flex: 1, backgroundColor: "#3b3b3b", alignItems: "center"}} >
+        <SafeAreaView style = {{flex: 1, backgroundColor: "#111", alignItems: "center"}} >
             <View style = {styles.LogoBannerView}>
-                <View style = {{flexDirection: "row"}}>
-                    <TouchableOpacity style = {{marginLeft: 20}} onPress = { () => {navigation.goBack(null)} } >
-                        <Ionicons style = {{alignSelf: "center"}} name = "chevron-back" size = {24} color = "#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 20}}>
                         <Octicons name="three-bars" size={24} color="#fff"/>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Text style = {{color: "#fff", fontSize: 25}}>Search</Text>
+                <View style={{flex: 1}}>
+                    <Text style = {{color: "#fff", fontSize: 25, marginLeft: -35}}>Search</Text>
                 </View>
-                {/* <TouchableOpacity style = {{marginRight: 20}}>
-                    <Feather name="send" size={24} color="#fff" />
-                </TouchableOpacity> */}
-                <View style = {{width: 63}}></View>
             </View>
             <View style = {{backgroundColor: "#fff", height: 1}}/>
             <View style = {styles.SearchView}>
@@ -107,9 +102,8 @@ export default function SearchScreen( {navigation} ) {
 const styles = StyleSheet.create({
     TextInputContainer: {
         // flex: 1,
-        borderRadius: 30,
-        borderWidth: 1,
-        borderColor: "#fff",
+        borderBottomColor: 'white',
+        borderBottomWidth: 1,
         height: 50,
         width: '85%',
         margin: 5,
@@ -120,7 +114,7 @@ const styles = StyleSheet.create({
         //flex: 1,
         padding: 10,
         //margin: 5,
-        width: "85%",
+        // width: "85%",
         color: "#fff"
         //margin: 10
     },
@@ -128,21 +122,21 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         width: "100%",
         //marginTop: 60,
-        backgroundColor: "#3b3b3b",
+        backgroundColor: "#111",
     },
     SearchView: {
         paddingTop: 15,
         flexDirection: "row",
         width: "100%",
         // marginTop: 30,
-        backgroundColor: "#3b3b3b",
+        backgroundColor: "#111",
         justifyContent: "center",
         marginBottom: 15
     },
     LogoBannerView: {
         flexDirection: "row",
         // marginTop: 60,
-        justifyContent: "space-between",
+        // justifyContent: "center",
         width: "100%",
         paddingTop: 10,
         paddingBottom: 10,

@@ -39,19 +39,26 @@ router.post( "/makePost", upload.single( "image" ), async( req, res ) => {
     }
 });
 
+router.post( "/getPost", async( req, res ) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const post = await Post.findById({_id: req.body.postId});
+    const user = await User.findById({_id: post.userId});
+    res.send( {post: post, user: user} );
+});
+
 router.post( "/deletePost", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const user = await User.findById( { _id: req.body.userId }, { noPosts: 1 } );
-    if ( decodedToken._id != req.userId )
+    if ( decodedToken._id != req.body.userId )
         return res.send( "Error" );
     try {
         await User.updateOne( { _id: user._id }, { noPosts: user.noPosts - 1 } );
-        await Post.deleteOne( { _id: req.body._id } );
-        res.send( "Deleted" );
+        await Post.deleteOne( { _id: req.body.postId } );
+        //res.send( "Deleted" );
     } catch(error) {
         console.log(error);
     }
-    res.send( "Deleted!" );
+    //res.send( "Deleted!" );
 });
 
 router.post( "/like", async( req, res ) => {
@@ -78,7 +85,7 @@ router.post( "/getLikers", async( req, res ) => {
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
     const likersList = await Likes.find( { postId: req.body.postId }, { userId: 1 } );
     const userList = [];
-    for ( var i = 0; i < req.body.likes; i ++ )
+    for ( var i = 0; i < likersList.length; i ++ )
         userList[i] = await User.findById( { _id: likersList[i].userId }, projection );
     res.send( userList );
 });
@@ -130,7 +137,7 @@ router.post( "/getReplies", async( req, res ) => {
     const comms = await Comment.find( { fatherCommentId: req.body.commentId } );
     for ( var i = 0; i < comms.length; i ++ ) {
         const user = await User.findById( { _id: comms[i].userId }, projection );
-        const userRepliedTo = await User.findById( { _id: req.body.userId }, projection );;
+        const userRepliedTo = await User.findById( { _id: req.body.userId }, projection );
         replies.push({ comment: comms[i], user: user, userRepliedTo: userRepliedTo });
         await getAllChildren( comms[i]._id );
     }
@@ -150,48 +157,59 @@ router.post( "/comment", async( req, res ) => {
     });
     try {
         await comm.save();
-        res.send( "Posted" );
+        await Post.updateOne( { _id: req.body.postId }, { noComments: post.noComments + 1 } );
+        res.send( comm );
     } catch (error) {
         console.log(error);
     }
-    await Post.updateOne( { _id: req.body.postId }, { noComments: post.noComments + 1 } );
 });
 
-async function deleteAllChildren( comment, post ) {
-    var children = await Comment.find( { fatherCommentId: comment._id } );
-    for ( var i = 0; i < comment.noReplies; i ++ ) {
+async function deleteAllChildren( commentId ) {
+    var children = await Comment.find( { fatherCommentId: commentId } );
+    if ( children.length == 0 )
+        return 0;
+    var delta = 0;
+    for ( var i = 0; i < children.length; i ++ ) {
         await Comment.deleteOne( { _id: children[i]._id } );
-        await Post.updateOne( { _id: post._id }, { noComments: post.noComments - 1 } );
-        post.noComments --;
-        await deleteAllChildren( children[i], post );
+        delta += await deleteAllChildren( children[i]._id ) + 1;
     }
+    return delta;
 }
 
 router.post( "/deleteComment", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     if ( decodedToken._id != req.body.userId )
-        return res.send("Error!");
+        return res.send("Error");
+    
+    const comment = await Comment.findById({_id: req.body.commentId});
+    await Comment.deleteOne( { _id: req.body.commentId } );
 
-    await Comment.deleteOne( { _id: req.body.comment._id } );
+    const deleted = await deleteAllChildren(req.body.commentId);
 
-    const post = await Post.findById( { _id: req.body.comment.postId } );
-    await Post.updateOne( { _id: post._id }, { noComments: post.noComments - 1 } );
-    post.noComments --;
+    const post = await Post.findById( { _id: comment.postId } );
+    await Post.updateOne( { _id: post._id }, { noComments: post.noComments - deleted - 1 } );
+    post.noComments -= deleted + 1;
 
-    await deleteAllChildren( req.body.comment, post );
+    await updateAllParents(req.body.fatherCommentId, -deleted - 1);
 
-    if ( req.body.comment.fatherCommentId != undefined ) {
-        const fatherComment = await Comment.findById( { _id: req.body.comment.fatherCommentId } );
-        await Comment.updateOne( { _id: fatherComment._id }, { noReplies: fatherComment.noReplies - 1 } );
-    }
-
-    res.send( "Comment deleted!" );
+    res.send( "Succes" );
 });
+
+async function updateAllParents(fatherCommentId, val) {
+    if ( fatherCommentId ) {
+        const fatherComment = await Comment.findById( { _id: fatherCommentId } );
+        if (fatherComment) {
+            await Comment.updateOne( { _id: fatherComment._id }, { noReplies: fatherComment.noReplies + val } );
+            if ( !fatherComment.fatherCommentId )
+                return fatherComment._id;
+            return await updateAllParents(fatherComment.fatherCommentId, val);
+        }
+    }
+}
 
 router.post( "/replyToComment", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const post = await Post.findById( { _id: req.body.postId } );
-    const fathercomm = await Comment.findById( { _id: req.body.fatherCommentId } );
     const comm = new Comment({
         userId: decodedToken._id,
         postId: req.body.postId,
@@ -201,12 +219,11 @@ router.post( "/replyToComment", async( req, res ) => {
         noLikes: 0
     });
 
-    await Post.updateOne( { _id: req.body.postId }, { noComments: post.noComments + 1 } );
-    await Comment.updateOne( { _id: fathercomm._id }, { noReplies: fathercomm.noReplies + 1 } );
-
     try {
         await comm.save();
-        res.send( "Posted" );
+        var rootCommentId = await updateAllParents(comm.fatherCommentId, 1);
+        await Post.updateOne( { _id: req.body.postId }, { noComments: post.noComments + 1 } );
+        res.send( {comment: comm, rootCommentId: rootCommentId } );
     } catch (error) {
         console.log(error);
     }

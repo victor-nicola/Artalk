@@ -1,11 +1,12 @@
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Octicons, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Picker, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Picker, ScrollView, KeyboardAvoidingView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Mime from "mime";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnvContext } from "../../containers/envContext";
+import { useLinkTo } from "@react-navigation/native";
 
 export default function MakePostScreen({navigation}) {
     const [title, setTitle] = useState( "" );
@@ -32,34 +33,44 @@ export default function MakePostScreen({navigation}) {
         .then((res) => alert(res));
     };
 
+    const linkTo = useLinkTo();
+
     return (
-        <View style = {{flex: 1, width: "100%", backgroundColor: "#3b3b3b"}}>
-            <TouchableOpacity style = {{marginLeft: 20, marginTop: 10, height: "fit-content"}} onPress = { () => {navigation.goBack(null)} } >
-                <Ionicons name = "chevron-back" size = {24} color = "#fff" />
-            </TouchableOpacity>
+        <View style = {{flex: 1, width: "100%", backgroundColor: "#111", paddingTop: 5}}>
+            <View style = {styles.LogoBanner} >
+                <View style = {{flex: 1, alignItems: "center", flexDirection: "row"}}>
+                    <TouchableOpacity onPress={()=>{navigation.toggleDrawer()}} style = {{marginLeft: 15}}>
+                        <Octicons name="three-bars" size={24} color="#fff"/>
+                    </TouchableOpacity>
+                </View>
+                <View style={{flex: 1}}>
+                    <Text style = {{marginLeft: -60, fontSize:30, color: "#fff"}}>Make gig</Text>
+                </View>
+            </View>
             <ScrollView contentContainerStyle = {styles.ViewContainer}>
-                <View style = {styles.TextInputContainer}>
-                    <TextInput style = {styles.TextInput} placeholder = {"Title"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setTitle( text ) }/>
-                </View>
-                <View style = {styles.TextInputContainer}>
-                    <TextInput style = {styles.TextInput} placeholder = {"Description"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setText( text ) }/>
-                </View>
-                <View style = {styles.TextInputContainer}>
-                    <TextInput style = {styles.TextInput} placeholder = {"Price per hour"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setPrice( new Number(text) ) }/>
-                </View>
-                <View style = {{flexDirection: "row", paddingTop: 10, paddingBottom: 10}}>
-                    <Text style = {{marginRight: 20, fontSize: 20, color: "#fff"}}>Type:</Text>
-                    <Picker style = {{backgroundColor: "#3b3b3b", borderWidth: 0, color: "#fff", fontSize: 20}} onValueChange = {(itemValue, itemPosition) => setType(itemValue)}>
-                        <Picker.Item label = "Anything" value = ""/>
-                        <Picker.Item label = "Painting" value = "painting"/>
-                        <Picker.Item label = "Digital art" value = "digital art"/>
-                        <Picker.Item label = "Photography" value = "photography"/>
-                        <Picker.Item label = "Videography" value = "videography"/>
-                        <Picker.Item label = "Sculpture" value = "sculpture"/>
-                    </Picker>
-                </View>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <View style = {styles.TextInputContainer}>
+                        <TextInput style = {styles.TextInput} placeholder = {"Title"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setTitle( text ) }/>
+                    </View>
+                    <View style = {styles.TextInputContainer}>
+                        <TextInput multiline={true} style = {styles.TextInput} placeholder = {"Description"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setText( text ) }/>
+                    </View>
+                    <View style = {styles.TextInputContainer}>
+                        <TextInput style = {styles.TextInput} placeholder = {"Price per hour"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setPrice( new Number(text) ) }/>
+                    </View>
+                    <View style = {{flexDirection: "row", paddingTop: 10, paddingBottom: 10}}>
+                        <Text style = {{marginRight: 20, fontSize: 20, color: "#fff"}}>Type:</Text>
+                        <Picker style = {{backgroundColor: "#111", borderWidth: 0, color: "#fff", fontSize: 20}} onValueChange = {(itemValue, itemPosition) => setType(itemValue)}>
+                            <Picker.Item label = "Anything" value = ""/>
+                            <Picker.Item label = "Painting" value = "painting"/>
+                            <Picker.Item label = "Digital art" value = "digital art"/>
+                            <Picker.Item label = "Photography" value = "photography"/>
+                            <Picker.Item label = "Sculpture" value = "sculpture"/>
+                        </Picker>
+                    </View>
+                </KeyboardAvoidingView>
                 <TouchableOpacity style = {styles.TouchableOpacity} onPress = {() => { makeGig(); }}>
-                    <Text>Post</Text>
+                    <Text style={styles.ButtonText}>Post</Text>
                 </TouchableOpacity>
             </ScrollView>
         </View>
@@ -76,20 +87,31 @@ const styles = StyleSheet.create({
         backgroundColor: "#9c9c9c",
         margin: 5
     },
+    ButtonText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white"
+    },
     TouchableOpacity: {
-        width: "60%",
-        borderRadius: 30,
-        height: 40,
-        alignItems: "center",
+        height: 30,
+        //flex: 1,
+        //margin: 5,
+        width: "100%",
+        backgroundColor: "#115aba",
+        borderRadius: 5,
+        borderWidth: 1,
+        //borderColor: "#fff",
+        height: 50,
+        width: 300,
+        margin: 5,
+        alignItems: 'center',
         justifyContent: "center",
-        backgroundColor: "#9c9c9c",
-        margin: 5
     },
     ViewContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#3b3b3b",
+        backgroundColor: "#111",
         //margin: 5,
         width:'100%'
     },
@@ -97,6 +119,13 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: "bold",
         color: "#fff"
+    },
+    LogoBanner: {
+        flexDirection: "row",
+        // marginTop: 60,
+        width: "100%",
+        paddingBottom: 10,
+        // backgroundColor: "blue"
     },
     TextInputContainer: {
         //flex: 1,
@@ -114,7 +143,7 @@ const styles = StyleSheet.create({
         //flex: 1,
         padding: 10,
         //margin: 5,
-        width: "80%",
+        // width: "80%",
         color: "#fff"
         //margin: 10
     }
