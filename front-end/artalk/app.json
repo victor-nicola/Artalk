@@ -1,7 +1,6 @@
 {
   "expo": {
     "name": "artalk",
-    "scheme": "artalk",
     "slug": "artalk",
     "version": "1.0.0",
     "orientation": "portrait",
