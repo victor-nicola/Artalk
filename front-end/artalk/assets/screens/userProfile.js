@@ -242,7 +242,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
     
         await fetch( ipString + "api/user/getPosts", options )
         .then((res) => res.json())
-        .then((res) => setData(res));
+        .then((res) => {console.log("getPosts"); setData(res)});
     };
 
     const getGigs = async() => {
@@ -273,14 +273,15 @@ export default function UserProfile( {navigation, route: {params}} ) {
         };
     
         await fetch( ipString + "api/user/like", options )
-        .then((res) => res.text())
-        .then((res) => alert(res));
+        .then((res) => res.text());
         setTimeout( () => refresh( elem, 1 ), 10 );
     };
 
     const dislike = async( elem ) => {
         var token = await AsyncStorage.getItem( "userToken" );
-    
+        
+        console.log(elem.post.likes);
+
         const options = {
             method: "POST",
             headers: {
@@ -290,8 +291,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
         };
     
         await fetch( ipString + "api/user/dislike", options )
-        .then((res) => res.text())
-        .then((res) => alert(res));
+        .then((res) => res.text());
         setTimeout( () => refresh( elem, -1 ), 10 );
     };
 
@@ -365,9 +365,13 @@ export default function UserProfile( {navigation, route: {params}} ) {
     
         await fetch( ipString + "api/user/deletePost", options )
         .then((res) => res.text())
-        .then((res) => {if(res)alert(res);});
-
-        getPosts();
+        .then((res) => {
+            if(res)
+                alert(res);
+            // const newData = data.filter((post)=>post.post._id != elem.post._id);
+            // console.log(newData);
+            // setData(newData);
+        });
     };
     
     const deleteGig = async(elem) => {

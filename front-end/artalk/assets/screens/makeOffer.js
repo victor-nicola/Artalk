@@ -1,7 +1,7 @@
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Platform, Picker, ScrollView, KeyboardAvoidingView } from "react-native";
+import { View, Text, StyleSheet, TextInput, useWindowDimensions, TouchableOpacity, Platform, Picker, ScrollView, KeyboardAvoidingView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Mime from "mime";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,6 +14,22 @@ export default function MakePostScreen({navigation}) {
     const [price, setPrice] = useState( 0 );
     const [type, setType] = useState( "" );
     const { ipString } = useContext( EnvContext );
+    const {height, width} = useWindowDimensions();
+    const [inputSize, setInputSize] = useState(100);
+    
+    window.addEventListener("resize", ()=>{
+        if ( window.innerWidth / 2 < 300 )
+            setInputSize(300);
+        else
+            setInputSize(window.innerWidth / 2);
+    });
+
+    useEffect(() => {
+        if ( width / 2 < 300 )
+            setInputSize(300);
+        else
+            setInputSize(width / 2);
+    });
 
     const makeGig = async() => {
         var token = await AsyncStorage.getItem( "userToken" );
@@ -48,23 +64,24 @@ export default function MakePostScreen({navigation}) {
                 </View>
             </View>
             <ScrollView contentContainerStyle = {styles.ViewContainer}>
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                    <View style = {styles.TextInputContainer}>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{width: '100%', alignItems: 'center'}}>
+                    <View style = {{borderBottomWidth: 1,borderColor: "#fff",height: 50,width: inputSize,margin: 5}}>
                         <TextInput style = {styles.TextInput} placeholder = {"Title"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setTitle( text ) }/>
                     </View>
-                    <View style = {styles.TextInputContainer}>
+                    <View style = {{borderBottomWidth: 1,borderColor: "#fff",height: 50,width: inputSize,margin: 5}}>
                         <TextInput multiline={true} style = {styles.TextInput} placeholder = {"Description"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setText( text ) }/>
                     </View>
-                    <View style = {styles.TextInputContainer}>
+                    <View style = {{borderBottomWidth: 1,borderColor: "#fff",height: 50,width: inputSize,margin: 5}}>
                         <TextInput style = {styles.TextInput} placeholder = {"Price per hour"} placeholderTextColor = "#fff" onChangeText = { ( text ) => setPrice( new Number(text) ) }/>
                     </View>
                     <View style = {{flexDirection: "row", paddingTop: 10, paddingBottom: 10}}>
                         <Text style = {{marginRight: 20, fontSize: 20, color: "#fff"}}>Type:</Text>
                         <Picker style = {{backgroundColor: "#111", borderWidth: 0, color: "#fff", fontSize: 20}} onValueChange = {(itemValue, itemPosition) => setType(itemValue)}>
                             <Picker.Item label = "Anything" value = ""/>
-                            <Picker.Item label = "Painting" value = "painting"/>
-                            <Picker.Item label = "Digital art" value = "digital art"/>
                             <Picker.Item label = "Photography" value = "photography"/>
+                            <Picker.Item label = "Digital art" value = "digital art"/>
+                            <Picker.Item label = "Design" value = "design"/>
+                            <Picker.Item label = "Painting" value = "painting"/>
                             <Picker.Item label = "Sculpture" value = "sculpture"/>
                         </Picker>
                     </View>
@@ -96,7 +113,7 @@ const styles = StyleSheet.create({
         height: 30,
         //flex: 1,
         //margin: 5,
-        width: "100%",
+        // width: "100%",
         backgroundColor: "#115aba",
         borderRadius: 5,
         borderWidth: 1,
@@ -126,17 +143,6 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingBottom: 10,
         // backgroundColor: "blue"
-    },
-    TextInputContainer: {
-        //flex: 1,
-        //borderRadius: 30,
-        //borderWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: "#fff",
-        height: 50,
-        width: '90%',
-        margin: 5,
-        justifyContent: "center"
     },
     TextInput: {
         height: 50,

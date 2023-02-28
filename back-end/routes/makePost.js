@@ -80,6 +80,18 @@ router.post( "/like", async( req, res ) => {
     }
 });
 
+router.post( "/dislike", async( req, res ) => {
+    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
+    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.postId } );
+    if ( !liked )
+        return res.send( "Not liked" );
+
+    await Likes.deleteOne( { userId: decodedToken._id, postId: req.body.postId } );
+    
+    await Post.updateOne( { _id: req.body.postId }, { likes: req.body.noLikes - 1 } );
+    res.send( "Disliked" );
+});
+
 router.post( "/getLikers", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
     const projection = { name: 1, surname: 1, username: 1, image: 1, noFollowers: 1, noFollowing: 1 };
@@ -90,17 +102,6 @@ router.post( "/getLikers", async( req, res ) => {
     res.send( userList );
 });
 
-router.post( "/dislike", async( req, res ) => {
-    const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );
-    const liked = await Likes.findOne( { userId: decodedToken._id, postId: req.body.postId } );
-    if ( !liked )
-        return res.send( "Not liked" );
-
-    await Likes.deleteOne( { userId: decodedToken._id, postId: req.body.postId } );
-    
-    await Post.updateOne( { _id: req.body.postId }, { likes: req.body.nolikes - 1 } );
-    res.send( "Disliked" );
-});
 
 router.post( "/getComments", async( req, res ) => {
     const decodedToken = jwt.verify( req.body.token, process.env.TOKEN_SECRET );

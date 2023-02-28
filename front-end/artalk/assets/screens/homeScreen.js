@@ -120,7 +120,7 @@ export default function HomeScreen( {navigation} ) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify( {token: token, postId: elem.post._id, nolikes: elem.post.likes} )
+            body: JSON.stringify( {token: token, postId: elem.post._id, noLikes: elem.post.likes} )
         };
     
         await fetch( ipString + "api/user/dislike", options )

@@ -145,9 +145,10 @@ export default function OffersScreen( {navigation} ) {
                     <Text style = {{marginLeft: -110, fontSize: textSize, color: "#fff"}}>Gigs for:</Text>
                     <Picker style = {{backgroundColor: "#111", marginLeft: 10, color:'white', borderWidth: 0, fontSize: textSize/6*5}} onValueChange = {(itemValue, itemPosition) => setType(itemValue)}>
                         <Picker.Item label = "Anything" value = ""/>
-                        <Picker.Item label = "Painting" value = "painting"/>
-                        <Picker.Item label = "Digital art" value = "digital art"/>
                         <Picker.Item label = "Photography" value = "photography"/>
+                        <Picker.Item label = "Digital art" value = "digital art"/>
+                        <Picker.Item label = "Design" value = "design"/>
+                        <Picker.Item label = "Painting" value = "painting"/>
                         <Picker.Item label = "Sculpture" value = "sculpture"/>
                     </Picker>
                 </View>
