@@ -175,6 +175,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
     const {id} = params;
     const [searchedUser, setSearchedUser] = useState();
     const [isFollowed, setIsFollowed] = useState( Boolean );
+    const [noFollowers, setNoFollowers] = useState(0);
     const [data, setData] = useState( [] );
     const [underline, setUnderline] = useState(0);
     const {height, width} = useWindowDimensions();
@@ -225,7 +226,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
 
         await fetch( ipString + "api/user/getUserData", options )
         .then((res) => res.json())
-        .then((res) => {setSearchedUser(res);});
+        .then((res) => {setSearchedUser(res);setNoFollowers(res.noFollowers);});
     };
 
     const getPosts = async() => {
@@ -313,7 +314,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
     
         await fetch( ipString + "api/user/follow", options )
         .then((res) => res.text())
-        .then((res) => {alert(res); setIsFollowed(true);});
+        .then((res) => {setIsFollowed(true);setNoFollowers(noFollowers + 1);});
     };
 
     const checkFollow = async() => {
@@ -348,7 +349,7 @@ export default function UserProfile( {navigation, route: {params}} ) {
     
         await fetch( ipString + "api/user/unfollow", options )
         .then((res) => res.text())
-        .then((res) => {alert(res);setIsFollowed(false);});
+        .then((res) => {setIsFollowed(false);setNoFollowers(noFollowers - 1);});
     };
 
     const deletePost = async(elem) => {
@@ -442,14 +443,14 @@ export default function UserProfile( {navigation, route: {params}} ) {
                             <Caption style = {{fontSize: textSize / 4 * 3, alignSelf: "center", color: "#fff"}}>@{searchedUser.username}</Caption>
                         </View>
                         <View style = { { flexDirection: "row", justifyContent: "center" } }>
-                            { searchedUser.noFollowers > 1 && <TouchableOpacity onPress = {() => { linkTo( "/followers/" + id ); }}>
-                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{searchedUser.noFollowers} followers</Caption>
+                            { noFollowers > 1 && <TouchableOpacity onPress = {() => { linkTo( "/followers/" + id ); }}>
+                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{noFollowers} followers</Caption>
                             </TouchableOpacity> }
-                            { searchedUser.noFollowers == 1 && <TouchableOpacity onPress = {() => { linkTo( "/followers/" + id ); }}>
-                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{searchedUser.noFollowers} follower</Caption>
+                            { noFollowers == 1 && <TouchableOpacity onPress = {() => { linkTo( "/followers/" + id ); }}>
+                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{noFollowers} follower</Caption>
                             </TouchableOpacity> }
-                            { searchedUser.noFollowers == 0 && <TouchableOpacity>
-                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{searchedUser.noFollowers} followers</Caption>
+                            { noFollowers == 0 && <TouchableOpacity>
+                                <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>{noFollowers} followers</Caption>
                             </TouchableOpacity> }
                             <Caption style = {{margin: 5, fontSize: textSize / 4 * 3, color: "#fff"}}>|</Caption>
                             { searchedUser.noFollowing > 0 && <TouchableOpacity onPress = {() => { linkTo( "/following/" + id ); }}>
