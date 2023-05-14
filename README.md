@@ -1,5 +1,5 @@
 # Artalk
-## Pagini Web
+## Categoria Web
 #### Nicola Victor-Teodor, clasa a 10-a, Colegiul National de Informatica "Tudor Vianu", Isabela Coman, Victor Manz
 O retea de socializare care vine in ajutorul artistilor ce nu se mai pot promova eficient online din cauza faptului ca toate retelele de socializare incurajeaza doar continutul video, astfel ilustratori, pictori, sculptori, fotografi etc au ramas fara o platforma care sa-i valorizeze. De asemenea, Artalk are si o mica parte de freelancing: fiecare utilizator poate sa-si puna un gig in care descrie experienta pe care o are si in ce domeniu, iar un potential client poate filtra prin toate aceste giguri si poate gasi persoana perfecta cu care poate colabora. Apoi, clientul ii poate scrie artistului in privat despre proiectul la care are nevoie de ajutor.
 # Limbajul de programare: JavaScript
